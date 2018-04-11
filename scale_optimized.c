@@ -140,7 +140,13 @@ float readScale(int scale, fd_set *inputSet, struct timeval *timeOut, FILE *log)
                 {
                     decimal_point = buffer[1] & 0b00000111;
                     isNegative = buffer[1] & 0b00100000;
+
                     isOverflow = buffer[1] & 0b10000000;
+                    if (isOverflow)
+                    {
+                        errorLogging("Scale overflow", log);
+                        return ERROR_SCALE_OVERFLOW;
+                    }
 
                     digit1 = buffer[2] & 0b00001111;
                     digit2 = buffer[2] & 0b11110000 >> 4;
@@ -223,42 +229,41 @@ int main(void)
     errorLogging("Testing", log);
     assert(log);
 
-    // timeOut.tv_sec = SELECT_TIMEOUT;
-    // timeOut.tv_usec = 0;
-    // fd_set inputSet;
-    // int scale = openScale(log);
-    // float result;
+    timeOut.tv_sec = SELECT_TIMEOUT;
+    timeOut.tv_usec = 0;
+    fd_set inputSet;
+    int scale = openScale(log);
+    float result;
 
-    //     for (;;)
-    //     {
-    //         FD_ZERO(&inputSet);
-    //         FD_SET(scale, &inputSet);
-    //         result = readScale(scale, &inputSet, &timeOut, log);
-    // #ifdef DEBUG
-    //         printf("\nThe scale reading is %f\n", result);
-    // #endif
-    //         if (result == ERROR_INVALID_SCALE_READING)
-    //         {
-    //             errorLogging("invalid reading\n", log);
-    //         }
-    //         else if (result == ERROR_NOT_ENOUGH_READ_BYTES)
-    //         {
-    //             errorLogging("not enough read bytes\n", log);
-    //         }
-    //         else if (result == SCALE_WEIGHT_SAME)
-    //         {
-    //             // does nothing since the weight doesn't change
-    //         }
-    //          else if (result == ERROR_FLUSH_FAILED)
-    // {
+    for (;;)
+    {
+        FD_ZERO(&inputSet);
+        FD_SET(scale, &inputSet);
+        result = readScale(scale, &inputSet, &timeOut, log);
+#ifdef DEBUG
+        printf("\nThe scale reading is %f\n", result);
+#endif
+        if (result == ERROR_INVALID_SCALE_READING)
+        {
+            errorLogging("invalid reading\n", log);
+        }
+        else if (result == ERROR_NOT_ENOUGH_READ_BYTES)
+        {
+            errorLogging("not enough read bytes\n", log);
+        }
+        else if (result == SCALE_WEIGHT_SAME)
+        {
+            // does nothing since the weight doesn't change
+        }
+        else if (result == ERROR_FLUSH_FAILED)
+        {
+        }
+        else
+        {
+            fprintf(saveFile, "%f", result);
+        }
+    }
 
-    // }
-    //         else
-    //         {
-    //             fprintf(saveFile, "%f", result);
-    //         }
-    //     }
-
-    //     closeScale(scale, log);
+    closeScale(scale, log);
     return 0;
 }
