@@ -76,8 +76,6 @@ sed -i 's/\"exited_cleanly\": true/' ${HOME}/.config/chromium/Default/Preference
 echo "point-rpi" | tee --append ${DISPLAY_FILE} # move mouse to convenient position
 echo "unclutter -idle 0.001 -root" | tee --append ${DISPLAY_FILE} # hide mouse pointer
 
-
-
 # create symlink for the scale, the number seems to be same for every scale
 echo "ACTION==\"add\",SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"0403\", ATTRS{idProduct}==\"6001\", SYMLINK+=\"SCALE\"" | sudo tee --append /etc/udev/rules.d/99-com.rules
 
