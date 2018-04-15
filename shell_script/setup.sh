@@ -56,6 +56,8 @@ else
 touch ${DISPLAY_FILE}
 fi
 
+echo "export MODE=COMPOST" | tee --append ${STARTUP_FILE} # set env var MODE to compost by default
+
 #-------------------------------------------------------------------------------
 
 printf "\n{GREEN}Beginning Display Configuration${RESET}"
