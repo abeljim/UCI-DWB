@@ -2,46 +2,42 @@
 # used for daily maintainance
 # pin state ref: https://raspberrypi.stackexchange.com/questions/51479/gpio-pin-states-on-powerup
 
-YELLOW='\033[38;5;226m' #for error
-GREEN='\033[38;5;154m' #for general messages
-RESET='\033[0m' #for resetting the color
-
 # pins if pulled high, indicate the correspoding bin types
-COMPOST_PIN=22
-RECYCLE_PIN=24
-LANDFILL_PIN=10
-GPIO_DIR="/sys/class/gpio/"
+compost_pin=22
+recycle_pin=24
+landfill_pin=10
+gpio_dir="/sys/class/gpio/"
 
 #time for the computer to reboot, based on food court inactive hour
-REBOOT_TIME="24:00" 
-PROJECT_NAME="UCI-DWB"
+reboot_time="24:00" 
+project_name="UCI-DWB"
 
 #--------------------------------------------------------------
 
 # this section will check which mode this bin is operating in based on jumper position
 # prep pins for reading
-echo ${COMPOST_PIN} > ${GPIO_DIR}/export
-echo ${RECYCLE_PIN} > ${GPIO_DIR}/export
-echo ${LANDFILL_PIN} > ${GPIO_DIR}/export
+echo ${compost_pin} > ${gpio_dir}/export
+echo ${recycle_pin} > ${gpio_dir}/export
+echo ${landfill_pin} > ${gpio_dir}/export
 
-echo "in" > ${GPIO_DIR}/gpio${COMPOST_PIN}/direction
-echo "in" > ${GPIO_DIR}/gpio${RECYCLE_PIN}/direction
-echo "in" > ${GPIO_DIR}/gpio${LANDFILL_PIN}/direction
+echo "in" > ${gpio_dir}/gpio${compost_pin}/direction
+echo "in" > ${gpio_dir}/gpio${recycle_pin}/direction
+echo "in" > ${gpio_dir}/gpio${landfill_pin}/direction
 
-if [ $(cat ${GPIO_DIR}/gpio${COMPOST_PIN}/value) = 1 ] && [ $(cat ${GPIO_DIR}/gpio${RECYCLE_PIN}/value) = 0 ] && [ $(cat ${GPIO_DIR}/gpio${LANDFILL_PIN}/value) = 0 ]
+if [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 1 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 0 ]
 then 
-    NEW_MODE=COMPOST
-elif [ $(cat ${GPIO_DIR}/gpio${COMPOST_PIN}/value) = 0 ] && [ $(cat ${GPIO_DIR}/gpio${RECYCLE_PIN}/value) = 1 ] && [ $(cat ${GPIO_DIR}/gpio${LANDFILL_PIN}/value) = 0 ]
+    new_mode=COMPOST
+elif [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 1 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 0 ]
 then 
-    NEW_MODE=RECYCLE
-elif [ $(cat ${GPIO_DIR}/gpio${COMPOST_PIN}/value) = 0 ] && [ $(cat ${GPIO_DIR}/gpio${RECYCLE_PIN}/value) = 0 ] && [ $(cat ${GPIO_DIR}/gpio${LANDFILL_PIN}/value) = 1 ]
+    new_mode=RECYCLE
+elif [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 1 ]
 then 
-    NEW_MODE=LANDFILL
+    new_mode=LANDFILL
 fi
 
 # only launch the script again if the mode is different from last time
-if [ ${NEW_MODE} != ${MODE} ]; then
-sed -i "s|^export MODE=.*$|export MODE=${NEW_MODE}|g" ~/.bashrc
+if [ "${new_mode}" != ${MODE} ]; then
+sed -i "s|^export MODE=.*$|export MODE=${new_mode}|g" ~/.bashrc
 source ~/.bashrc
 fi
 
@@ -57,14 +53,14 @@ sudo apt-get dist-upgrade -y
 sudo timedatectl set-timezone US/Pacific 
 
 # software update
-git -C ~/${PROJECT_NAME}/ fetch
+git -C ~/${project_name}/ fetch
 # only pull and rerun stuffs if there is update
 if [ $(git rev-list  --count origin/release...release) > 0 ]; then
-git -C ~/${PROJECT_NAME}/ pull 
+git -C ~/${project_name}/ pull 
 source ~/.bashrc
 fi
 
 sudo ifconfig wlan0 down
-shutdown -r ${REBOOT_TIME}
+shutdown -r ${reboot_time}
 
 exit 0
