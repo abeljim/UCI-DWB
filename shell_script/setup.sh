@@ -25,8 +25,7 @@ sudo sed -i '/XKBLAYOUT/d' /etc/default/keyboard
 echo XKBLAYOUT=\"us\" | sudo tee -a /etc/default/keyboard
 
 #change password from default
-read -t 0.1 100000 unused # discard everything in stdin so far
-read -p  
+empty_input_buffer   
 print_message "Please enter new password"
 passwd
 sudo passwd -l root # lock root account

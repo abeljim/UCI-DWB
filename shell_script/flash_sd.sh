@@ -17,8 +17,16 @@ if ! gzip -t $1; then
 print_error "Zip file not valid\n"
 exit 1
 else 
+print_message "ALL SD CARD WILL BE OVERWRITTEN, make sure they have at only one FAT partition " 
+print_message "Please press any key to confirm writing"
+empty_input_buffer
+read confirmation
 print_message "Beginning copying to sd card"
-SD_LIST="$(ls /dev/ | grep -G "mmcblk[0123456789]$")" # find all sd card on system
+
+# find all sd card on connected on system
+# criteria is based on their partition having FAT32 type
+SD_LIST="$(ls /dev/ | grep -G "mmcblk[0123456789]$")"
+SD_LIST="${SD_LIST} $(sudo fdisk -l | grep FAT32 | sed -E 's|/dev/sd(.)(.*)|/dev/sd\1|g')" 
 
 if [ -z SD_LIST ]; then 
 print_error "No SD card in system\n"

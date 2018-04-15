@@ -12,7 +12,7 @@ block_size=64K # generally recommended
 #-------------------------------------------------------------------
 
 # check arguments to see if they are actually folder and file descriptor to sd card
-if [ ! -d $1 ] || [ ! -f $2 ]; then
+if [ ! -d $1 ] || [ ! -b $2 ]; then
 print_error "Given directory is not valid\n"
 exit 1
 

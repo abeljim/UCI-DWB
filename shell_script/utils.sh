@@ -31,6 +31,13 @@ print_section()
 log () 
 {
     touch ./log_file.log
-    
+
+    return 0
+}
+
+# discard everything in stdin so far works with multi line garbage
+empty_input_buffer()
+{
+    read -d '' -t 0.1 -n 100000 unused 
     return 0
 }
