@@ -12,11 +12,14 @@
 
 #include "scale_optimized.h"
 
+#define DEBUG
+
 // possible values are "compost", "landfill", "recycle", CASE SENSITIVE
 #define MODE "compost"
 
 #define SCALE_DEV_FILE "/dev/SCALE"
-#define SAVE_DIR "/home/pi/UCI-Digital-Waste-Bin/final/";
+// #define SAVE_DIR "/home/pi/UCI-DWB/final/";
+#define SAVE_DIR "/home/khoi/UCI-DWB/";
 #define SCALE_MESSAGE_SIZE 6
 #define RECONNECT_ATTEMPTS 5
 #define UNIT_CONVERSION 16.0
@@ -68,6 +71,7 @@ int openScale(FILE *log)
             errorLogging(strerror(errno), log);
         }
     }
+    return 0;
 }
 
 void errorLogging(char *message, FILE *log)
@@ -136,7 +140,13 @@ float readScale(int scale, fd_set *inputSet, struct timeval *timeOut, FILE *log)
                 {
                     decimal_point = buffer[1] & 0b00000111;
                     isNegative = buffer[1] & 0b00100000;
+
                     isOverflow = buffer[1] & 0b10000000;
+                    if (isOverflow)
+                    {
+                        errorLogging("Scale overflow", log);
+                        return ERROR_SCALE_OVERFLOW;
+                    }
 
                     digit1 = buffer[2] & 0b00001111;
                     digit2 = buffer[2] & 0b11110000 >> 4;
@@ -171,10 +181,16 @@ float readScale(int scale, fd_set *inputSet, struct timeval *timeOut, FILE *log)
                     else
                     {
                         errorLogging("failed to flush file\n", log);
+                        return ERROR_FLUSH_FAILED;
                     }
                 }
             }
         }
+    }
+
+    else
+    {
+        return SCALE_WEIGHT_SAME;
     }
 }
 
@@ -194,10 +210,9 @@ int closeScale(int scale, FILE *log)
         errorLogging("failed to load scale\n", log);
         exit(-1);
     }
+    fclose(log);
+    return 0;
 }
-
-#ifdef DEBUG
-#endif
 
 int main(void)
 {
@@ -211,6 +226,7 @@ int main(void)
     char logDir[100] = SAVE_DIR;
     strcat(logDir, "/log");
     FILE *log = fopen(logDir, "a");
+    errorLogging("Testing", log);
     assert(log);
 
     timeOut.tv_sec = SELECT_TIMEOUT;
@@ -224,7 +240,9 @@ int main(void)
         FD_ZERO(&inputSet);
         FD_SET(scale, &inputSet);
         result = readScale(scale, &inputSet, &timeOut, log);
-
+#ifdef DEBUG
+        printf("\nThe scale reading is %f\n", result);
+#endif
         if (result == ERROR_INVALID_SCALE_READING)
         {
             errorLogging("invalid reading\n", log);
@@ -236,6 +254,9 @@ int main(void)
         else if (result == SCALE_WEIGHT_SAME)
         {
             // does nothing since the weight doesn't change
+        }
+        else if (result == ERROR_FLUSH_FAILED)
+        {
         }
         else
         {
