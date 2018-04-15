@@ -9,8 +9,10 @@ landfill_pin=10
 gpio_dir="/sys/class/gpio/"
 
 #time for the computer to reboot, based on food court inactive hour
-reboot_time="24:00" 
+reboot_time="24:00"
 project_name="UCI-DWB"
+
+source ./utils.sh
 
 #--------------------------------------------------------------
 
@@ -25,14 +27,16 @@ echo "in" > ${gpio_dir}/gpio${recycle_pin}/direction
 echo "in" > ${gpio_dir}/gpio${landfill_pin}/direction
 
 if [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 1 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 0 ]
-then 
+then
     new_mode=COMPOST
 elif [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 1 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 0 ]
-then 
+then
     new_mode=RECYCLE
 elif [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 1 ]
-then 
+then
     new_mode=LANDFILL
+else
+    # log 
 fi
 
 # only launch the script again if the mode is different from last time
@@ -47,16 +51,16 @@ sudo ufw enable # enable firewall if not enabled
 sudo ifconfig wlan0 up # turn on network
 sleep 20 # give wlan0 time to wake up
 
-sudo service ntp restart 
+sudo service ntp restart
 sudo apt-get update
-sudo apt-get dist-upgrade -y 
-sudo timedatectl set-timezone US/Pacific 
+sudo apt-get dist-upgrade -y
+sudo timedatectl set-timezone US/Pacific
 
 # software update
 git -C ~/${project_name}/ fetch
 # only pull and rerun stuffs if there is update
 if [ $(git rev-list  --count origin/release...release) > 0 ]; then
-git -C ~/${project_name}/ pull 
+git -C ~/${project_name}/ pull
 source ~/.bashrc
 fi
 
