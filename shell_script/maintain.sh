@@ -8,6 +8,7 @@ PROJECT_NAME="UCI-DWB"
 shutdown -r ${REBOOT_TIME}
 
 # MAINTAINANCE CODE
+git checkout release
 sudo ufw enable # enable firewall if not enabled
 sudo ifconfig wlan0 up # turn on network
 sleep 20 # give wlan0 time to wake up
