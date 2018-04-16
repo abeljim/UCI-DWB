@@ -56,6 +56,9 @@ touch ${display_file}
 fi
 
 echo "export MODE=COMPOST" | tee --append ${startup_file} # set env var MODE to compost by default
+echo "export NON_ROOT_USER=${USER}" | tee --append ${startup_file} # set env var MODE to compost by default
+# autologin
+sudo sed -i 's|ExecStart=-/sbin/agetty --noclear %I $TERM| ExecStart=-/sbin/agetty --noclear -a root %I $TERM |g' /lib/systemd/system/getty@.service
 
 #-------------------------------------------------------------------------------
 
