@@ -44,7 +44,7 @@ log ()
 # discard everything in stdin so far works with multi line garbage
 empty_input_buffer()
 {
-    read -d '' -t 0.1 -n 100000 unused
+    read -d '' -t 0.1 -n 100000 unused || true # make sure this doesn't raise errors
     return 0
 }
 

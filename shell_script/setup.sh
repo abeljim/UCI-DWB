@@ -18,6 +18,11 @@ set -o pipefail
 set -o nounset
 
 #-------------------------------------------------------------------------------
+if [ ${USER} = pi ] || [ ${USER} = root ]; then
+  print_error "Please don't use pi or root for install, create another account first\n"
+  exit 1
+fi
+
 print_message "Starting setup"
 
 # change keyboard layout to make sure the rest of installation is correct

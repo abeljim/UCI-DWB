@@ -61,11 +61,19 @@ sudo apt-get dist-upgrade -y >> /dev/null
 sudo timedatectl set-timezone US/Pacific >> /dev/null
 
 # software update
-git -C ${NON_ROOT_USER_DIR}/${project_name}/ fetch
+if ! git -C ${NON_ROOT_USER_DIR}/${project_name}/ fetch > /dev/null 2>&1; then 
+    log "ERROR" "UPDATE" "Failed To Fetch"
+    reboot
+fi
 # only pull and rerun stuffs if there is update
 if [ $(git rev-list  --count origin/release...release) > 0 ]; then
-git -C ${NON_ROOT_USER_DIR}/${project_name}/ pull
+log "INFO" "UPDATE" "Found Upates"
+if git -C ${NON_ROOT_USER_DIR}/${project_name}/ pull > /dev/null 2>&1 ; then
+log "INFO" "UPDATE" "Finished Applying Update"
 exec ${STARTUP_FILE}
+else
+log "ERROR" "UPDATE" "Error updating"
+fi
 fi
 
 sudo ifconfig wlan0 down
