@@ -88,6 +88,16 @@ echo "chromium-browser --noerrdialogs --kiosk --incognito --allow-file-access-fr
 
 echo "xinit" | tee --append ${startup_file} # start x server at login
 
+# set 720p to the pi, source for the settings: https://elinux.org/RPiconfig#Video_mode_options 
+sudo sed -i 's/.*hdmi_mode=.*//' ${boot_config_file} # wipe old settings first
+sudo sed -i 's/.*hdmi_group=.*//' ${boot_config_file}
+echo "hdmi_mode=4" | sudo tee --append ${boot_config_file} # change to new mode
+echo "hdmi_group=1" | sudo tee --append ${boot_config_file}
+
+# enable full screen 
+sudo sed -i 's/.*disable_overscan=.*//' ${boot_config_file}
+echo "disable_overscan=1" | sudo tee --append ${boot_config_file}
+
 sudo apt autoremove -y
 # change branch upstream source
 git -C ~/${project_name}/ branch --set-upstream-to release origin/release 
