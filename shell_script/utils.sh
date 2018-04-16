@@ -48,4 +48,3 @@ empty_input_buffer()
     return 0
 }
 
-log "ERROR" "Barn" "Yep, Fire here too"

@@ -13,8 +13,10 @@ reboot_time="24:00"
 project_name="UCI-DWB"
 
 source ./utils.sh
+STARTUP_FILE="/home/${NON_ROOT_USER}/.bashrc"
 
 #--------------------------------------------------------------
+log "INFO" "MAINTAIN" "Starting Maintainance"
 
 # this section will check which mode this bin is operating in based on jumper position
 # prep pins for reading
@@ -36,13 +38,15 @@ elif [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/
 then
     new_mode=LANDFILL
 else
-    # log 
+    log "ERROR" "GPIO" "Unknown Pin State"
+    sleep 5
+    reboot 
 fi
 
 # only launch the script again if the mode is different from last time
-if [ "${new_mode}" != ${MODE} ]; then
-sed -i "s|^export MODE=.*$|export MODE=${new_mode}|g" ~/.bashrc
-source ~/.bashrc
+if [ "${new_mode}" != "${MODE}" ]; then
+sed -i "s|^export MODE=.*$|export MODE=${new_mode}|g" ${STARTUP_FILE}
+exec ${STARTUP_FILE} # stop executing this script and relaunch bashrc to update env var MODE
 fi
 
 # MAINTAINANCE CODE
@@ -51,20 +55,22 @@ sudo ufw enable # enable firewall if not enabled
 sudo ifconfig wlan0 up # turn on network
 sleep 20 # give wlan0 time to wake up
 
-sudo service ntp restart
-sudo apt-get update
-sudo apt-get dist-upgrade -y
-sudo timedatectl set-timezone US/Pacific
+sudo service ntp restart >> /dev/null
+sudo apt-get update >> /dev/null
+sudo apt-get dist-upgrade -y >> /dev/null 
+sudo timedatectl set-timezone US/Pacific >> /dev/null
 
 # software update
-git -C ~/${project_name}/ fetch
+git -C ${NON_ROOT_USER_DIR}/${project_name}/ fetch
 # only pull and rerun stuffs if there is update
 if [ $(git rev-list  --count origin/release...release) > 0 ]; then
-git -C ~/${project_name}/ pull
-source ~/.bashrc
+git -C ${NON_ROOT_USER_DIR}/${project_name}/ pull
+exec ${STARTUP_FILE}
 fi
 
 sudo ifconfig wlan0 down
+log "INFO" "MAINTAIN" "Finish Maintainance"
+su - ${NON_ROOT_USER} # change to non-root user for the rest of the day
 shutdown -r ${reboot_time}
 
 exit 0
