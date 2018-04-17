@@ -6,8 +6,8 @@ software=" server-xorg xinit ufw ntp gcc chromium-browser unclutter git "
 
 version="final"
 project_name="UCI-DWB"
-startup_file="~/.bashrc" # location of file that would be run when user logins
-display_file="~/.xinitrc"
+startup_file="${HOME}/.bashrc" # location of file that would be run when user logins
+display_file="${HOME}/.xinitrc"
 boot_config_file="/boot/config.txt"
 MODE="compost" # later become env variable to determine which mode this pi is running on
 
@@ -73,7 +73,7 @@ print_message "Beginning Display Configuration"
 echo "${HOME}/${project_name}/shell_script/maintain.sh &" | tee --append ${startup_file}
 
 # replace chromium pref file, TODO: change this to sed in the future
-cp -f ~/UCI-DWB/Preferences_Chromium ${HOME}/.config/chromium/Default/Preferences 
+cp -f ${HOME}/UCI-DWB/Preferences_Chromium ${HOME}/.config/chromium/Default/Preferences 
 
 # disable screen blanking
 echo "xset s off" |  tee --append ${display_file}
@@ -105,7 +105,7 @@ echo "disable_overscan=1" | sudo tee --append ${boot_config_file}
 
 sudo apt autoremove -y
 # change branch upstream source
-git -C ~/${project_name}/ branch --set-upstream-to release origin/release 
+git -C ${HOME}/${project_name}/ branch --set-upstream-to release origin/release 
 
 print_message "Setup done, the system will reboot in 5 seconds"
 sleep 5
