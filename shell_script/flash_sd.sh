@@ -37,6 +37,8 @@ fi
 for sd_card in ${SD_LIST}; do
 print_message "Copying to ${sd_card}\n"
 gzip -dc $1 | dd of=/dev/${sd_card} bs=${block_size}
+sync
+sudo eject /dev/${sd_card}
 done
 
 print_message "Done copying to all sd card\n"
