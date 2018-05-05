@@ -19,9 +19,16 @@ set -o nounset
 
 #-------------------------------------------------------------------------------
 if [ ${USER} = pi ] || [ ${USER} = root ]; then
-  print_error "Please don't use pi or root for install, create another account first\n"
+  print_error "Please don't use pi or root for install, create another account without root privilege first\n"
   exit 1
 fi
+non_root_user="${USER}"
+non_root_home="${HOME}"
+
+sudo -i # login to root and begin the setup
+print_message "Please enter new root password"
+empty_input_buffer   
+passwd
 
 print_message "Starting setup"
 
@@ -29,11 +36,7 @@ print_message "Starting setup"
 sudo sed -i '/XKBLAYOUT/d' /etc/default/keyboard
 echo XKBLAYOUT=\"us\" | sudo tee -a /etc/default/keyboard
 
-#change password from default
-empty_input_buffer   
-print_message "Please enter new password"
-passwd
-sudo passwd -l root # lock root account
+
 
 print_message "Beginning Software Install"
 # update and install the necessary software
@@ -61,9 +64,9 @@ touch ${display_file}
 fi
 
 echo "export MODE=COMPOST" | tee --append ${startup_file} # set env var MODE to compost by default
-echo "export NON_ROOT_USER=${USER}" | tee --append ${startup_file} # set env var MODE to compost by default
+echo "export NON_ROOT_USER=${non_root_user}" | tee --append ${startup_file} # set env var MODE to compost by default
 echo "export TOTAL_FAILURE=0" | tee --append ${startup_file}
-# autologin
+# autologin to root by default
 sudo sed -i 's|ExecStart=-/sbin/agetty --noclear %I $TERM| ExecStart=-/sbin/agetty --noclear -a root %I $TERM |g' /lib/systemd/system/getty@.service
 
 #-------------------------------------------------------------------------------
@@ -71,17 +74,17 @@ sudo sed -i 's|ExecStart=-/sbin/agetty --noclear %I $TERM| ExecStart=-/sbin/aget
 print_message "Beginning Display Configuration"
 
 # run this maintain script at startup, everything else run after maintain
-echo "${HOME}/${project_name}/shell_script/maintain.sh &" | tee --append ${startup_file}
+echo "${non_root_home}/${project_name}/shell_script/maintain.sh &" | tee --append ${startup_file}
 
 # replace chromium pref file, TODO: change this to sed in the future
-cp -f ${HOME}/UCI-DWB/Preferences_Chromium ${HOME}/.config/chromium/Default/Preferences 
+cp -f ${non_root_home}/UCI-DWB/Preferences_Chromium ${non_root_home}/.config/chromium/Default/Preferences 
 
 # disable screen blanking
 echo "xset s off" |  tee --append ${display_file}
 echo "xset -dpms" |  tee --append ${display_file}
 echo "xset s noblank" |  tee --append ${display_file}
 
-sed -i 's/\"exited_cleanly\": true/' ${HOME}/.config/chromium/Default/Preferences # disable chromium message about unclean shutdown
+sed -i 's/\"exited_cleanly\": true/' ${non_root_home}/.config/chromium/Default/Preferences # disable chromium message about unclean shutdown
 
 echo "point-rpi" | tee --append ${display_file} # move mouse to convenient position
 echo "unclutter -idle 0.001 -root" | tee --append ${display_file} # hide mouse pointer
@@ -90,7 +93,7 @@ echo "unclutter -idle 0.001 -root" | tee --append ${display_file} # hide mouse p
 echo "ACTION==\"add\",SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"0403\", ATTRS{idProduct}==\"6001\", SYMLINK+=\"SCALE\"" | sudo tee --append /etc/udev/rules.d/99-com.rules
 
 # add running html file to display file
-echo "chromium-browser --noerrdialogs --kiosk --incognito --allow-file-access-from-files ${HOME}/${project_name}/${MODE}/index.html &" | tee --append ${display_file}
+echo "chromium-browser --noerrdialogs --kiosk --incognito --allow-file-access-from-files ${non_root_home}/${project_name}/${MODE}/index.html &" | tee --append ${display_file}
 
 echo "xinit" | tee --append ${startup_file} # start x server at login
 
@@ -106,7 +109,7 @@ echo "disable_overscan=1" | sudo tee --append ${boot_config_file}
 
 sudo apt autoremove -y
 # change branch upstream source
-git -C ${HOME}/${project_name}/ branch --set-upstream-to release origin/release 
+git -C ${non_root_home}/${project_name}/ branch --set-upstream-to release origin/release 
 
 print_message "Setup done, the system will reboot in 5 seconds"
 sleep 5
