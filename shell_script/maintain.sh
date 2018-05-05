@@ -51,9 +51,7 @@ exec ${startup_file} # stop executing this script and relaunch bashrc to update 
 fi
 
 # MAINTAINANCE CODE
-git -C ${
-    
-}/${project_name}/ checkout release # change branch to receive update from release
+git -C ${non_root_user_dir}/${project_name}/ checkout release # change branch to receive update from release
 sudo ufw enable # enable firewall if not enabled
 sudo ifconfig wlan0 up # turn on network
 sleep 20 # give wlan0 time to wake up
@@ -67,6 +65,7 @@ sudo timedatectl set-timezone US/Pacific >> /dev/null
 if ! git -C ${non_root_user_dir}/${project_name}/ fetch ; then 
     log "ERROR" "UPDATE" "Failed To Fetch"
     if [ "${TOTAL_FAILURE}" -gt 5 ]; then
+    log "ERROR" "UPDATE" "Failed updating more than 5 times"
     exit 1 # exit and leave the screen blank so people can contact the team instead of infinite reboot
     fi
     let "TOTAL_FAILURE=TOTAL_FAILURE+1"
@@ -74,7 +73,7 @@ if ! git -C ${non_root_user_dir}/${project_name}/ fetch ; then
     reboot
 fi
 # only pull and rerun stuffs if there is update
-if [ $(git rev-list  --count origin/release...release) > 0 ]; then
+if [ $(git -C ${non_root_user_dir}/${project_name}/ rev-list  --count origin/release...release) -gt 0 ]; then
 log "INFO" "UPDATE" "Found Upates"
 if git -C ${non_root_user_dir}/${project_name}/ pull ; then
 log "INFO" "UPDATE" "Finished Applying Update"
@@ -82,6 +81,7 @@ exec ${startup_file}
 else
 log "ERROR" "UPDATE" "Error updating"
 if [ "${TOTAL_FAILURE}" -gt 5 ]; then
+    log "ERROR" "UPDATE" "Failed updating more than 5 times"
     exit 1 # exit and leave the screen blank so people can contact the team instead of infinite reboot
 fi
 let "TOTAL_FAILURE=TOTAL_FAILURE+1"
