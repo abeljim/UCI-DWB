@@ -68,7 +68,7 @@ if ! git -C ${non_root_user_dir}/${project_name}/ fetch ; then
     log "ERROR" "UPDATE" "Failed updating more than 5 times"
     exit 1 # exit and leave the screen blank so people can contact the team instead of infinite reboot
     fi
-    let "TOTAL_FAILURE=TOTAL_FAILURE+1"
+    TOTAL_FAILURE=$((TOTAL_FAILURE+1))
     sed -i "s|^export TOTAL_FAILURE=.*$|export TOTAL_FAILURE=${TOTAL_FAILURE}|g" ${startup_file}
     reboot
 fi
@@ -84,7 +84,7 @@ if [ "${TOTAL_FAILURE}" -gt 5 ]; then
     log "ERROR" "UPDATE" "Failed updating more than 5 times"
     exit 1 # exit and leave the screen blank so people can contact the team instead of infinite reboot
 fi
-let "TOTAL_FAILURE=TOTAL_FAILURE+1"
+TOTAL_FAILURE=$((TOTAL_FAILURE+1))
 sed -i "s|^export TOTAL_FAILURE=.*$|export TOTAL_FAILURE=${TOTAL_FAILURE}|g" ${startup_file}
 reboot
 
