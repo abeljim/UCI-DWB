@@ -60,17 +60,17 @@ int openScale(FILE *log) {
   scale_settings.c_cflag &= ~(CSIZE | PARENB);
   scale_settings.c_cflag |= CS8;
   scale_settings.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
-
+  scale_settings.c_cc[VMIN] = 6; // read will wait for at least 6 bytes
+  scale_settings.c_cc[VTIME] = 0;
   if (!cfsetospeed(&scale_settings, B9600) &&
       !tcsetattr(scale, TCSANOW, &scale_settings)) {
-    // setup successful
+    return scale;
   } else {
     errorLogging("error while setting scale with error code \n", log,
                  "OPEN_SCALE");
     errorLogging(strerror(errno), log, "OPEN_SCALE");
+    return -1;
   }
-
-  return 0;
 }
 
 void errorLogging(char *message, FILE *log, char *code_section) {
@@ -91,6 +91,7 @@ void errorLogging(char *message, FILE *log, char *code_section) {
 
   fprintf(log, "%s", errMessage);
   fprintf(log, "\n");
+  fflush(log);
 }
 
 // read the scale from file descriptor, select set and timeout struct
@@ -112,7 +113,7 @@ float readScale(int scale, fd_set *inputSet, struct timeval *timeOut,
   static float prevResult = 0; // unit is ounces
   float result;
   const float weight_threshold = 0.1; // unit is ounces
-  if (select(scale, inputSet, NULL, NULL, timeOut)) {
+  if (select(scale + 1, inputSet, NULL, NULL, timeOut)) {
     temp = read(scale, buffer, SCALE_MESSAGE_SIZE);
     if (temp != 6 && temp >= 0) {
       return ERROR_NOT_ENOUGH_READ_BYTES;
