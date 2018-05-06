@@ -40,6 +40,7 @@ print_message "Beginning copying to sd card"
 for sd_card in ${SD_LIST}; do
 print_message "Copying to ${sd_card}\n"
 gzip -dc $1 | sudo dd of=${sd_card} bs=${block_size}
+
 done
 
 print_message "Done copying to all sd card\n"
