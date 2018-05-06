@@ -1,3 +1,9 @@
+/**
+ * @brief contain functions used for scale I/O
+ * @file scale_optimized.c
+ * @author Khoi Trinh
+ * Contain all functions that work directly with the scale file desciptor
+ */
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -18,17 +24,30 @@
 // #define SCALE_DEV_FILE "/dev/SCALE"
 #define SCALE_DEV_FILE "/dev/ttyACM0"
 
-#define SCALE_MESSAGE_SIZE 6
-#define RECONNECT_ATTEMPTS 5
+#define SCALE_MESSAGE_SIZE 6  //!< defined by the manual
+#define RECONNECT_ATTEMPTS \
+  5  //!< how many times the code will try connecting to scale before giving up
 #define LBS_TO_OUNCE_CONV 16.0
-#define WEIGHT_THRESHOLD 0.1  // min increase in lbs before we consider it a change in weight
+#define WEIGHT_THRESHOLD 0.1  //!< min increase in lbs before we consider it a change in weight
 
-#define OPEN_SCALE_TRIAL 5   // how many times we try to open the scale before exit
-#define CLOST_SCALE_TRIAL 6  // how many times we try to close the scale before exit
+#define OPEN_SCALE_TRIAL 5   //!< how many times we try to open the scale before exit
+#define CLOST_SCALE_TRIAL 6  //!< how many times we try to close the scale before exit
 
-#define SCALE_SIGNATURE 255  // signature value of the first byte given by manufacturer
+#define SCALE_SIGNATURE 255  //!< signature value of the first byte given by manufacturer
 
-// open file descriptor to writing to the scale
+/**
+ * @brief creat file descriptor for talking with scale
+ * @param log this is the log file dedicated only to the scale
+ * @return scale file descriptor that will be used for the rest of the communications or negative
+ * error code
+ *
+ * The settings of the scale communications is as follow:
+ * * 9600 baudrate, this is the max the scale can do
+ * * No parity, the scale doesn't have error checking
+ * * No output config since the scale doesn't receive command
+ * * Canonical mode with Blocking read and wait until at least 6 bytes
+ * * Data frame is 8 bit data, 1 stop bit
+ */
 int openScale(FILE *log)
 {
   int scale;
@@ -47,18 +66,14 @@ int openScale(FILE *log)
 
   struct termios scale_settings;
   bzero(&scale_settings, sizeof(scale_settings));
-  // this is the default settings for the serial port
-  // (port=None, baudrate=9600, bytesize=EIGHTBITS, parity=PARITY_NONE,
-  // stopbits=STOPBITS_ONE, timeout=None, xonxoff=False, rtscts=False,
-  // write_timeout=None, dsrdtr=False, inter_byte_timeout=None)
-  // non-canonical mode is used since this is burst data of fixed size
+
   scale_settings.c_lflag = 0;                // set mode to be non-canonical
   scale_settings.c_cflag |= CLOCAL | CREAD;  // ignore modem line and enable receiver
   scale_settings.c_iflag |= IGNPAR;          // ignore parity error
   scale_settings.c_cflag |= CS8;             // 8 bit character, 1 stop bit
 
   scale_settings.c_cc[VMIN]  = 6;  // read will wait for at least 6 bytes
-  scale_settings.c_cc[VTIME] = 0;
+  scale_settings.c_cc[VTIME] = 0;  // disable timeout
 
   tcflush(scale, TCIFLUSH);
   if (!cfsetispeed(&scale_settings, B9600) && !tcsetattr(scale, TCSANOW, &scale_settings))
@@ -73,7 +88,22 @@ int openScale(FILE *log)
     }
 }
 
-// read the scale from file descriptor, select set and timeout struct
+/**
+ * @brief read the scale if enough data is available
+ * @param scale the scale descriptor
+ * @param inputSet file descriptor set used with select
+ * @param timeOut timeval struct containing timeout info
+ *
+ * @return float represents the increase in weight in lbs or 0 for scale weight remaining the same
+ * or error code, all negative numbers returned are error code since weight decreasing is ignored
+ * except for one case where the trashbag is detected to have been replaced, the function will
+ * adjust the var that stored prev reading accordingly
+ *
+ * The function stores some data about the previous scale reading and compare with the current one
+ * to decide if the data has changed, this reduced waste of time spent processing repeated data,
+ * consult the scale manual for data frame example, once the scale has identified that the frame is
+ * a valid one based on the flag, it will process the bits accordingly
+ */
 float readScale(int scale, fd_set *inputSet, struct timeval *timeOut, FILE *log)
 {
   assert(scale >= 0);
@@ -199,6 +229,12 @@ float readScale(int scale, fd_set *inputSet, struct timeval *timeOut, FILE *log)
     }
 }
 
+/**
+ * @brief close the scale and the log associated with it
+ * @param scale file descriptor for the scale
+ * @param log file descriptor for log
+ * @return error code or 0 for success
+ */
 int closeScale(int scale, FILE *log)
 {
   assert(scale >= 0);

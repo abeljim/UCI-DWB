@@ -1,3 +1,13 @@
+/**
+ * @brief Main process for scale
+ * @file scale_main.c
+ * @author Khoi Trinh
+ *
+ * This is the main process of the scale, the main process would be responsible for setting up
+ * file handler for log, save files, as well as initilializing set used by select for multiplexing
+ * file handler and keep checking select to log errors or write results to the save file used by
+ * display
+ */
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -11,6 +21,11 @@
 #define TIMEOUT_LIMIT 5   // how many consecutive timeouts before we log an error
 #define SELECT_TIMEOUT 4  // unit is second
 
+/**
+ * @brief the main function responsible for managing the scale
+ * @return this should never return unless in special circumstances such as the physical scale or
+ * the pi is damaged
+ */
 int main(void)
 {
   // retrieve env var to get path for saving stuffs and determine the role of the bin

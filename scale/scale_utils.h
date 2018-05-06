@@ -1,3 +1,9 @@
+/**
+ * @brief header file for scale utilities
+ *
+ * @file scale_utils.h
+ * @author Khoi Trinh
+ */
 #ifndef _SCALE_UTILS_H
 #define _SCALE_UTILS_H
 
