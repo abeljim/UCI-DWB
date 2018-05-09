@@ -1,0 +1,94 @@
+{
+    "pools": [
+        {
+            "name": "CentaurMain",
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "item",
+                    "weight": 1,
+                    "name": "minecraft:leather",
+                    "functions": [
+                        {
+                            "function": "set_count",
+                            "count": {
+                                "min": 1,
+                                "max": 10
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "CentaurSpecial",
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "item",
+                    "weight": 95,
+                    "name": "tm:ingot_copper",
+                    "functions": [
+                        {
+                            "function": "set_count",
+                            "count": {
+                                "min": 1,
+                                "max": 4
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "item",
+                    "weight": 20000,
+                    "name": "tm:sword_copper",
+                    "functions": [
+                        {
+                            "function": "set_damage",
+                            "damage": {
+                                "min": 0.01,
+                                "max": 0.02
+                            }
+                        },
+                        {
+                            "function": "enchant_randomly",
+                            "enchantments": [
+                                "bane_of_arthropods",
+                                "smite"
+                            ]
+                        },
+                        {
+                            "function": "set_attributes",
+                            "modifiers": [
+                                {
+                                    "attribute": "generic.attackDamage",
+                                    "operation": "addition",
+                                    "amount": {
+                                        "min": 100,
+                                        "max": 150
+                                    },
+                                    "name": "AddDamage",
+                                    "slot": "mainhand"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "item",
+                    "weight": 4,
+                    "name": "minecraft:skull",
+                    "functions": [
+                        {
+                            "function": "set_data",
+                            "data": {
+                                "min": 0,
+                                "max": 4
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+[4197:4197:0114/042033.352168:ERROR:sandbox_linux.cc(344)] InitializeSandbox() called with multiple threads in process gpu-process.
+[1:12:0114/042033.406758:ERROR:adm_helpers.cc(62)] Failed to query stereo recording.
+Created new window in existing browser session.
+[3816:3845:0114/053543.064447:FATAL:bus.cc(1189)] D-Bus connection was disconnected. Aborting.
+#0 0x0000020d3eb0 <unknown>
+#1 0x0000020eb210 <unknown>
+#2 0x000002f81e4c <unknown>
+
+Received signal 6
+#0 0x0000020d3eb0 <unknown>
+#1 0x0000020d3e20 <unknown>
+#2 0x0000755116c0 <unknown>
+#3 0x00007551045c gsignal
+[end of stack trace]
+Calling _exit(1). Core file will not be generated.
