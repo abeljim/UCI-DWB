@@ -1,0 +1,22 @@
+
+
+# On boot these changes will start the website and run weight program
+
+# go to sudo nano ~/.config/lxsession/LXDE-pi/autostart
+#this removes screensaver mode
+#find @xscreensaver -no-splash comment it out
+#add under commeneted out code
+#these will change eneregy settings
+#@xset s off
+#@xset -dpms
+#@xset s noblank
+
+#This will fix errors if the trashcan loses power
+#@sed -i 's/"exited_cleanly": false/"exited_cleanly": true/' ~/.config/chromium/Default/Preferences
+
+#this start website
+#@chromium --noerrdialogs --kiosk --incognito --allow-file-access-from-files websitegoeshere 
+
+#this will start the program
+#@sudo /usr/bin/python /home/pi/filename.py
+
