@@ -21,7 +21,7 @@ check_bin_role
 git -C ${non_root_user_dir}/${project_name}/ checkout release # change branch to receive update from release
 sudo ufw enable # enable firewall if not enabled
 sudo ifconfig wlan0 up # turn on network
-sleep 12 # give wlan0 time to wake up
+sleep 11 # give wlan0 time to wake up
 
 sudo service ntp restart >> /dev/null
 sudo apt-get update >> /dev/null
