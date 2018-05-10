@@ -241,7 +241,7 @@ var CountUp = function (target, startVal, endVal, decimals, duration, options) {
 };
 
 /**
- * used by screen to wait before special effects
+ * used by screen to wait before/between special effects
  * @param {int} ms milliseconds to delay 
  */
 function sleep(ms) {

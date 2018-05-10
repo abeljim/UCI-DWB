@@ -1,6 +1,6 @@
 var Scale = {}; // scale namespace
-Scale.newScaleValue = 0; // used to be result 1
-Scale.oldScaleValue = 0; //new value, used to be result 2
+Scale.newScaleValue = 0;
+Scale.oldScaleValue = 0;
 Scale.resultFilePath = "file:///home/kd/UCI-DWB/javascript_and_json/result.json"
 Scale.binType = "default"
 
@@ -56,10 +56,8 @@ Scale.binTypeList = {
     }
 }
 
-var carouselIndex = 0;
-var readFlag;
-carousel();
 runProgram();
+carousel();
 
 /**
  * The main function, used to constantly check the scale value and call special effects if things change
@@ -75,6 +73,8 @@ async function runProgram() {
         await sleep(100); //sleep for 100 ms
         readTextFile(Scale.resultFilePath);
         console.log(Scale.newScaleValue);
+
+        // start display if new value different from prev value
         if (Scale.oldScaleValue != Scale.newScaleValue) {
             Scale.oldScaleValue = Scale.newScaleValue;
             console.log("IT is different");
@@ -97,6 +97,7 @@ async function runProgram() {
             pop.classList.remove('bounceup');
             bot3.classList.remove('bounceup');
 
+            // start counting animations based on the bin type
             if (Scale.binType != "landfill") {
                 var numAnim = new CountUp("tbox", 0.0, Scale.newScaleValue, 3, 2, Scale.binTypeList[Scale.binType].options);
                 if (!numAnim.error) {
@@ -164,17 +165,20 @@ async function readTextFile(file) {
     Scale.binType = scaleResult.binType;
 }
 
-
+/**
+ * Used to create slideshow and change image every once in a while
+ */
 async function carousel() {
+    var carouselIndex = 0;
     while (true) {
         var i;
-        var x = document.getElementsByClassName("mySlides");
-        for (i = 0; i < x.length; i++) {
-            x[i].style.display = "none";
+        var slideShow = document.getElementsByClassName("mySlides");
+        for (i = 0; i < slideShow.length; i++) {
+            slideShow[i].style.display = "none";
         }
         carouselIndex++;
-        if (carouselIndex > x.length) { carouselIndex = 1 }
-        x[carouselIndex - 1].style.display = "block";
+        if (carouselIndex > slideShow.length) { carouselIndex = 1 }
+        slideShow[carouselIndex - 1].style.display = "block";
         await sleep(8000); //change image every 8 seconds
     }
 }
