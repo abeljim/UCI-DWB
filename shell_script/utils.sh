@@ -71,13 +71,13 @@ echo "in" > ${gpio_dir}/gpio${landfill_pin}/direction
 
 if [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 1 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 0 ]
 then
-    new_mode=COMPOST
+    new_mode=compost
 elif [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 1 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 0 ]
 then
-    new_mode=RECYCLE
+    new_mode=recycle
 elif [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 1 ]
 then
-    new_mode=LANDFILL
+    new_mode=landfill
 else
     log "ERROR" "GPIO" "Unknown Pin State"
     sleep 5
