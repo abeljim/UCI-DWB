@@ -11,19 +11,22 @@ display_file="${HOME}/.xinitrc"
 boot_config_file="/boot/config.txt"
 MODE="compost" # later become env variable to determine which mode this pi is running on
 
-source ./utils.h
+source ./utils.sh
 
 set -e 
 set -o pipefail
 set -o nounset
 
 #-------------------------------------------------------------------------------
-if [ ${USER} = pi ] || [ ${USER} = root ]; then
-  print_error "Please don't use pi or root for install, create another account without root privilege first\n"
-  exit 1
+if [ ${USER} != pi ]; then
+print_error "You need to be user named pi to install"
 fi
-non_root_user="${USER}"
+sudo sed pi -i 's|ALL=(ALL) NOPASSWD: ALL|pi ALL=(ALL) ALL|g' /etc/sudoers.d/010_pi-nopasswd
+print_message "Please enter new password for pi"
+empty_input_buffer   
+passwd
 non_root_home="${HOME}"
+non_root_user="pi"
 
 sudo -i # login to root and begin the setup
 print_message "Please enter new root password"
@@ -64,15 +67,16 @@ fi
 echo "export MODE=COMPOST" | tee --append ${startup_file} # set env var MODE to compost by default
 echo "export NON_ROOT_USER=${non_root_user}" | tee --append ${startup_file} # set env var MODE to compost by default
 echo "export TOTAL_FAILURE=0" | tee --append ${startup_file}
-# autologin to root by default
-sudo sed -i 's|ExecStart=-/sbin/agetty --noclear %I $TERM| ExecStart=-/sbin/agetty --noclear -a root %I $TERM |g' /lib/systemd/system/getty@.service
+
+# # autologin to root by default
+# sudo sed -i 's|ExecStart=-/sbin/agetty --noclear %I $TERM| ExecStart=-/sbin/agetty --noclear -a root %I $TERM |g' /lib/systemd/system/getty@.service
 
 #-------------------------------------------------------------------------------
 
 print_message "Beginning Display Configuration"
 
 # run this maintain script at startup, everything else run after maintain
-echo "source ${non_root_home}/${project_name}/shell_script/maintain.sh &" | tee --append ${startup_file}
+echo "source ${non_root_home}/${project_name}/shell_script/maintain.sh &" | sudo tee --append /etc/rc.local
 
 # replace chromium pref file, TODO: change this to sed in the future
 cp -f ${non_root_home}/UCI-DWB/Preferences_Chromium ${non_root_home}/.config/chromium/Default/Preferences 

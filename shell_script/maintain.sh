@@ -7,9 +7,9 @@ reboot_time="24:00"
 project_name="UCI-DWB"
 
 source ./utils.sh
-startup_file="/home/${NON_ROOT_USER}/.bashrc" # NON_ROOT_USER set during initial installation
+startup_file="/home/pi/.bashrc" # NON_ROOT_USER set during initial installation
 chmod u+x startup_file
-non_root_user_dir="/home/${NON_ROOT_USER}"
+non_root_user_dir="/home/pi"
 #--------------------------------------------------------------
 log "INFO" "MAINTAIN" "Starting Maintainance"
 
