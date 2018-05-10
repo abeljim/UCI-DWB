@@ -58,7 +58,7 @@ else
 touch ${display_file}
 fi
 
-echo "export MODE=COMPOST" | tee --append ${startup_file} # set env var MODE to compost by default
+echo "export MODE=compost" | tee --append ${startup_file} # set env var MODE to compost by default
 echo "export NON_ROOT_USER=${non_root_user}" | tee --append ${startup_file} # set env var MODE to compost by default
 echo "export TOTAL_FAILURE=0" | tee --append ${startup_file}
 echo "git -C ${non_root_home}/${project_name}/ checkout release" | tee --append ${startup_file} # change to release branch at startup
