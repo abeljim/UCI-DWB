@@ -49,18 +49,22 @@ empty_input_buffer()
 }
 
 # pin state ref: https://raspberrypi.stackexchange.com/questions/51479/gpio-pin-states-on-powerup
+# pin graph ref:
+# https://www.jameco.com/Jameco/workshop/circuitnotes/raspberry-pi-circuit-note.html
 check_bin_role()
 {
+startup_file="/home/${NON_ROOT_USER}/.bashrc" # NON_ROOT_USER set during initial installation
+
 # pins if pulled high, indicate the correspoding bin types
 compost_pin=22
 recycle_pin=24
 landfill_pin=10
-gpio_dir="/sys/class/gpio/"
+gpio_dir="/sys/class/gpio"
 
+# pin setup these may failed if the pin is already setup
 echo ${compost_pin} > ${gpio_dir}/export
 echo ${recycle_pin} > ${gpio_dir}/export
 echo ${landfill_pin} > ${gpio_dir}/export
-
 echo "in" > ${gpio_dir}/gpio${compost_pin}/direction
 echo "in" > ${gpio_dir}/gpio${recycle_pin}/direction
 echo "in" > ${gpio_dir}/gpio${landfill_pin}/direction
@@ -83,7 +87,7 @@ fi
 # only launch the script again if the mode is different from last time
 if [ "${new_mode}" != "${MODE}" ]; then
 sed -i "s|^export MODE=.*$|export MODE=${new_mode}|g" ${startup_file}
-exec ${startup_file} # stop executing this script and relaunch bashrc to update env var MODE
+source ${startup_file} # stop executing this script and relaunch bashrc to update env var MODE
 else 
 return 0
 fi

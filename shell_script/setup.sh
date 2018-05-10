@@ -36,8 +36,6 @@ print_message "Starting setup"
 sudo sed -i '/XKBLAYOUT/d' /etc/default/keyboard
 echo XKBLAYOUT=\"us\" | sudo tee -a /etc/default/keyboard
 
-
-
 print_message "Beginning Software Install"
 # update and install the necessary software
 sudo apt-get update
@@ -74,7 +72,7 @@ sudo sed -i 's|ExecStart=-/sbin/agetty --noclear %I $TERM| ExecStart=-/sbin/aget
 print_message "Beginning Display Configuration"
 
 # run this maintain script at startup, everything else run after maintain
-echo "${non_root_home}/${project_name}/shell_script/maintain.sh &" | tee --append ${startup_file}
+echo "source ${non_root_home}/${project_name}/shell_script/maintain.sh &" | tee --append ${startup_file}
 
 # replace chromium pref file, TODO: change this to sed in the future
 cp -f ${non_root_home}/UCI-DWB/Preferences_Chromium ${non_root_home}/.config/chromium/Default/Preferences 

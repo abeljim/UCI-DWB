@@ -1,5 +1,6 @@
 #!/bin/bash
 # used for daily maintainance
+# NEED TO BE EXECUTED WITH THE SOURCE COMMAND
 
 #time for the computer to reboot, based on food court inactive hour
 reboot_time="24:00"
