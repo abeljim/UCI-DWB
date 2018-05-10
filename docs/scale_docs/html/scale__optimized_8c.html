@@ -97,7 +97,7 @@ Include dependency graph for scale_optimized.c:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:ae795333775ebb9d127fd2c77f0afaad9"><td class="memItemLeft" align="right" valign="top"><a id="ae795333775ebb9d127fd2c77f0afaad9"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>SCALE_DEV_FILE</b>&#160;&#160;&#160;&quot;/dev/ttyACM0&quot;</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>SCALE_DEV_FILE</b>&#160;&#160;&#160;&quot;/dev/ttyUSB0&quot;</td></tr>
 <tr class="separator:ae795333775ebb9d127fd2c77f0afaad9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a485c63ac55db1585fc6858dcee6adfc9"><td class="memItemLeft" align="right" valign="top"><a id="a485c63ac55db1585fc6858dcee6adfc9"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="scale__optimized_8c.html#a485c63ac55db1585fc6858dcee6adfc9">SCALE_MESSAGE_SIZE</a>&#160;&#160;&#160;6</td></tr>
@@ -105,7 +105,7 @@ Macros</h2></td></tr>
 <tr class="separator:a485c63ac55db1585fc6858dcee6adfc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3ebde3e5864449d18f729e0db652fd5"><td class="memItemLeft" align="right" valign="top"><a id="ae3ebde3e5864449d18f729e0db652fd5"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="scale__optimized_8c.html#ae3ebde3e5864449d18f729e0db652fd5">RECONNECT_ATTEMPTS</a>&#160;&#160;&#160;5</td></tr>
-<tr class="memdesc:ae3ebde3e5864449d18f729e0db652fd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">how many times the code will try connecting to scale before giving up <br /></td></tr>
+<tr class="memdesc:ae3ebde3e5864449d18f729e0db652fd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">how many times the code will try connecting to scale or the savefile before giving up <br /></td></tr>
 <tr class="separator:ae3ebde3e5864449d18f729e0db652fd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a475f469714cf28b99c548265acdbef68"><td class="memItemLeft" align="right" valign="top"><a id="a475f469714cf28b99c548265acdbef68"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>LBS_TO_OUNCE_CONV</b>&#160;&#160;&#160;16.0</td></tr>
@@ -135,6 +135,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a2612526b3835ed315ed135420667a59c"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="scale__optimized_8c.html#a2612526b3835ed315ed135420667a59c">readScale</a> (int scale, fd_set *inputSet, struct timeval *timeOut, FILE *log)</td></tr>
 <tr class="memdesc:a2612526b3835ed315ed135420667a59c"><td class="mdescLeft">&#160;</td><td class="mdescRight">read the scale if enough data is available  <a href="#a2612526b3835ed315ed135420667a59c">More...</a><br /></td></tr>
 <tr class="separator:a2612526b3835ed315ed135420667a59c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acfd015f86d96ddc2993d7a11d39e3f19"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="scale__optimized_8c.html#acfd015f86d96ddc2993d7a11d39e3f19">sendScaleResult</a> (float scaleResult, char *saveFileName, FILE *log, const char *mode)</td></tr>
+<tr class="memdesc:acfd015f86d96ddc2993d7a11d39e3f19"><td class="mdescLeft">&#160;</td><td class="mdescRight">send scale result to the display portion, may change in the future  <a href="#acfd015f86d96ddc2993d7a11d39e3f19">More...</a><br /></td></tr>
+<tr class="separator:acfd015f86d96ddc2993d7a11d39e3f19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed7cea49e2d478aefcfb61936502d4e8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="scale__optimized_8c.html#aed7cea49e2d478aefcfb61936502d4e8">closeScale</a> (int scale, FILE *log)</td></tr>
 <tr class="memdesc:aed7cea49e2d478aefcfb61936502d4e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">close the scale and the log associated with it  <a href="#aed7cea49e2d478aefcfb61936502d4e8">More...</a><br /></td></tr>
 <tr class="separator:aed7cea49e2d478aefcfb61936502d4e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -262,8 +265,57 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>float represents the increase in weight in lbs or 0 for scale weight remaining the same or error code, all negative numbers returned are error code since weight decreasing is ignored except for one case where the trashbag is detected to have been replaced, the function will adjust the var that stored prev reading accordingly</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>float represents the increase in weight in ounces or 0 for scale weight remaining the same or error code, all negative numbers returned are error code since weight decreasing is ignored except for one case where the trashbag is detected to have been replaced, the function will adjust the var that stored prev reading accordingly</dd></dl>
 <p>The function stores some data about the previous scale reading and compare with the current one to decide if the data has changed, this reduced waste of time spent processing repeated data, consult the scale manual for data frame example, once the scale has identified that the frame is a valid one based on the flag, it will process the bits accordingly </p>
+
+</div>
+</div>
+<a id="acfd015f86d96ddc2993d7a11d39e3f19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acfd015f86d96ddc2993d7a11d39e3f19">&#9670;&nbsp;</a></span>sendScaleResult()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int sendScaleResult </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>scaleResult</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>saveFileName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramname"><em>log</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>mode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>send scale result to the display portion, may change in the future </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mode</td><td>this is the mode of the scale, found by reading env variable on the pi</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Will open the file every time and close it after write because another process is reading this file so need to limit open time of the scale result file, if the first attempt fail, it will retry multiple times but if they all fail then, the write format currently follows json file </p>
 
 </div>
 </div>
