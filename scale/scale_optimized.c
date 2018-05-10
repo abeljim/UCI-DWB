@@ -270,7 +270,7 @@ int sendScaleResult(float scaleResult, char *saveFileName, FILE *log, const char
       if (totalReconnectAtempt == RECONNECT_ATTEMPTS) return ERROR_SAVE_FILE_INVALID;
     }
   fprintf(saveFile, "{\n");
-  fprintf(saveFile, "\t\"result\": %f,\n", scaleResult);
+  fprintf(saveFile, "\t\"weight\": %f,\n", scaleResult);
   fprintf(saveFile, "\t\"binType\": \"%s\"\n", mode);
   fprintf(saveFile, "}");
   if (fclose(saveFile))
