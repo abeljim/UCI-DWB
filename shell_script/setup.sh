@@ -92,9 +92,7 @@ echo "unclutter -idle 0.001 -root" | tee --append ${display_file} # hide mouse p
 echo "ACTION==\"add\",SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"0403\", ATTRS{idProduct}==\"6001\", SYMLINK+=\"SCALE\"" | sudo tee --append /etc/udev/rules.d/99-com.rules
 
 # add running html file to display file
-echo "chromium-browser --noerrdialogs --kiosk --incognito --allow-file-access-from-files ${non_root_home}/${project_name}/${MODE}/index.html &" | tee --append ${display_file}
-
-echo "xinit" | tee --append ${display_file} # start x server at login
+echo "chromium-browser --noerrdialogs --kiosk --incognito --allow-file-access-from-files ${non_root_home}/${project_name}/'${MODE}'/index.html &" | tee --append ${display_file}
 
 # set 720p to the pi, source for the settings: https://elinux.org/RPiconfig#Video_mode_options 
 sudo sed -i 's/.*hdmi_mode=.*//' ${boot_config_file} # wipe old settings first

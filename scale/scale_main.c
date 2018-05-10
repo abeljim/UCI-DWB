@@ -23,26 +23,17 @@
 
 /**
  * @brief the main function responsible for managing the scale
+ * @param argv this should contain the mode that the bin is running on at argv[1], the mode is
+ * detected by the startup script and fed into the scale at the end of the maintainance sequence
  * @return this should never return unless in special circumstances such as the physical scale or
- * the pi is damaged
+ * the pi is damaged(indicated by unresponsive scale)
  */
-int main(void)
+int main(int argc, char **argv)
 {
   // retrieve env var to get path for saving stuffs and determine the role of the bin
+
   const char *homeDir = getenv("HOME");
   assert(homeDir);
-  const char *mode = getenv("MODE");  // the MODE env var is defined during the scale setup
-  assert(mode);
-
-  char saveDir[100] = "";
-  strcat(saveDir, homeDir);
-  strcat(saveDir, "/UCI-DWB/");
-  strcat(saveDir, mode);
-  strcat(saveDir, "/javascript_and_json/result.json");
-  FILE *saveFile = fopen(saveDir, "w");
-  assert(saveFile);
-  fclose(saveFile);
-
   char logDir[100] = "";
   strcat(logDir, homeDir);
   strcat(logDir, "/UCI-DWB/scale");
@@ -51,6 +42,22 @@ int main(void)
   scaleLogging("INFO", "Testing", log, "OPEN_FILE");
   uint8_t timeoutCounter = 0;
   assert(log);
+
+  if ((strcmp(argv[1], "compost") && strcmp(argv[1], "recycle") && strcmp(argv[1], "landfill")) ||
+      argc < 2)
+    {
+      scaleLogging("ERROR", "Unknown bin type", log, "PRE_LOOP");
+      return 1;
+    }
+  char *mode         = argv[0];
+  char  saveDir[100] = "";
+  strcat(saveDir, homeDir);
+  strcat(saveDir, "/UCI-DWB/");
+  strcat(saveDir, mode);
+  strcat(saveDir, "/javascript_and_json/result.json");
+  FILE *saveFile = fopen(saveDir, "w");
+  assert(saveFile);
+  fclose(saveFile);
 
   int   scale = openScale(log);
   float result;
@@ -92,6 +99,7 @@ int main(void)
           if (timeoutCounter == TIMEOUT_LIMIT)
             {
               scaleLogging("ERROR", "Many Consecutive timeout", log, "AFTER_READ");
+              break;
             }
         }
       else if (result == ERROR_FLUSH_FAILED)

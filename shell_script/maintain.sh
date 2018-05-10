@@ -14,6 +14,9 @@ source ${non_root_user_dir}/utils.sh
 log "INFO" "MAINTAIN" "Starting Maintainance"
 
 check_bin_role
+mode=$?
+display_file="/home/pi/.xinitrc"
+sed -i "s/export MODE=.*/export MODE=${mode}/g" ${display_file}
 
 # MAINTAINANCE CODE
 git -C ${non_root_user_dir}/${project_name}/ checkout release # change branch to receive update from release
@@ -62,6 +65,11 @@ touch ${env_var_storage_file} #store env storage for rc.local
 sed -i "s|TOTAL_FAILURE=.*$||g" ${env_var_storage_file}
 echo "TOTAL_FAILURE=0" >> ${env_var_storage_file}
 log "INFO" "MAINTAIN" "Finish Maintainance"
-shutdown -r ${reboot_time}
+shutdown -r ${reboot_time} # schedule reboot everyday when the food court is not active
 
+# run scale code and start display
+make -C ${non_root_user_dir}/${project_name}/scale
+./${non_root_user_dir}/${project_name}/scale/scale_main.out ${mode} &
+sleep 1
+xinit &
 exit 0
