@@ -14,6 +14,8 @@
 #define ERROR_INVALID_SCALE_READING -3  //!< the data frame has the wrong flag
 #define ERROR_FLUSH_FAILED -4
 #define ERROR_SCALE_OVERFLOW -5  //!< current weight heavier than scale can handle
+#define ERROR_SAVE_FILE_INVALID -8
+#define ERROR_FAIL_TO_CLOSE_FILE -9
 
 #define SCALE_TIMEOUT -6
 #define SCALE_WEIGHT_DECREASED -7
@@ -22,6 +24,8 @@
 int openScale(FILE *log);
 
 float readScale(int scale, fd_set *inputSet, struct timeval *timeOut, FILE *log);
+
+int sendScaleResult(float scaleResult, char *saveFileName, FILE *log, const char *mode);
 
 int closeScale(int scale, FILE *log);
 #endif

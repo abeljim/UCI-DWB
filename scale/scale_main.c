@@ -41,6 +41,7 @@ int main(void)
   strcat(saveDir, "/result.json");
   FILE *saveFile = fopen(saveDir, "w");
   assert(saveFile);
+  fclose(saveFile);
 
   char logDir[100] = "";
   strcat(logDir, homeDir);
@@ -99,8 +100,13 @@ int main(void)
         }
       else
         {
-          timeoutCounter = 0;
-          fprintf(saveFile, "%f", result);
+          timeoutCounter     = 0;
+          int tempReturnCode = sendScaleResult(result, saveDir, log, mode);
+          if (tempReturnCode == ERROR_SAVE_FILE_INVALID ||
+              tempReturnCode == ERROR_FAIL_TO_CLOSE_FILE)
+            {
+              break;  // quit since something is wrong with the system
+            }
         }
     }
 

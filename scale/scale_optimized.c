@@ -22,11 +22,11 @@
 #include "scale_utils.h"
 
 // #define SCALE_DEV_FILE "/dev/SCALE"
-#define SCALE_DEV_FILE "/dev/ttyACM0"
+#define SCALE_DEV_FILE "/dev/ttyUSB0"
 
 #define SCALE_MESSAGE_SIZE 6  //!< defined by the manual
 #define RECONNECT_ATTEMPTS \
-  5  //!< how many times the code will try connecting to scale before giving up
+  5  //!< how many times the code will try connecting to scale or the savefile before giving up
 #define LBS_TO_OUNCE_CONV 16.0
 #define WEIGHT_THRESHOLD 0.1  //!< min increase in lbs before we consider it a change in weight
 
@@ -75,9 +75,13 @@ int openScale(FILE *log)
   scale_settings.c_cc[VMIN]  = 6;  // read will wait for at least 6 bytes
   scale_settings.c_cc[VTIME] = 0;  // disable timeout
 
+  // sleep needed for flush to work
+  sleep(3);
   tcflush(scale, TCIFLUSH);
   if (!cfsetispeed(&scale_settings, B9600) && !tcsetattr(scale, TCSANOW, &scale_settings))
     {
+      sleep(3);
+      tcflush(scale, TCIFLUSH);
       return scale;
     }
   else
@@ -144,7 +148,15 @@ float readScale(int scale, fd_set *inputSet, struct timeval *timeOut, FILE *log)
           if (buffer[0] != SCALE_SIGNATURE)
             {
 #ifdef DEBUG
-              printf("Invalid scale reading\n");
+              printf("Invalid scale reading, the reading is %d\n", buffer[0]);
+#ifdef DEBUG
+              printf("Computing Scale Reading\n");
+              for (int bufferIndex = 0; bufferIndex < 6; ++bufferIndex)
+                {
+                  printf("Buffer number %d is %d\n", bufferIndex, buffer[bufferIndex]);
+                }
+              printf("\n");
+#endif
 #endif
               return ERROR_INVALID_SCALE_READING;
             }
@@ -227,6 +239,46 @@ float readScale(int scale, fd_set *inputSet, struct timeval *timeOut, FILE *log)
     {
       return SCALE_TIMEOUT;
     }
+}
+
+/**
+ * @brief send scale result to the display portion, may change in the future
+ * @param mode this is the mode of the scale, found by reading env variable on the pi
+ *
+ * Will open the file every time and close it after write because another process is reading this
+ * file so need to limit open time of the scale result file, if the first attempt fail, it will
+ * retry multiple times but if they all fail then, the write format currently follows json file
+ */
+int sendScaleResult(float scaleResult, char *saveFileName, FILE *log, const char *mode)
+{
+  assert(log);
+  assert(saveFileName);
+  FILE *saveFile = fopen(saveFileName, "w");
+  if (saveFile == NULL)
+    {
+      scaleLogging("ERROR", "Failed to open save file before write", log, "DISPLAY_COMMUNICATION");
+      int totalReconnectAtempt = 0;
+      while (totalReconnectAtempt < RECONNECT_ATTEMPTS)
+        {
+          saveFile = fopen(saveFileName, "w");
+          if (saveFile != NULL)
+            {
+              break;
+            }
+          ++totalReconnectAtempt;
+        }
+      if (totalReconnectAtempt == RECONNECT_ATTEMPTS) return ERROR_SAVE_FILE_INVALID;
+    }
+  fprintf(saveFile, "{\n");
+  fprintf(saveFile, "\t\"result\": %f,\n", scaleResult);
+  fprintf(saveFile, "\t\"binType\": \"%s\"\n", mode);
+  fprintf(saveFile, "}");
+  if (fclose(saveFile))
+    {
+      scaleLogging("ERROR", "Failed to close save file after write", log, "DISPLAY_COMMUNICATION");
+      return ERROR_FAIL_TO_CLOSE_FILE;
+    }
+  return 0;
 }
 
 /**
