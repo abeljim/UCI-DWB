@@ -2,7 +2,7 @@
 # script file used for setting up rpi for digital wastebin
 
 # list of necessary software
-software=" server-xorg xinit ufw ntp gcc chromium-browser unclutter git "
+software=" xserver-xorg xinit ufw ntp gcc chromium-browser unclutter git "
 
 version="final"
 project_name="UCI-DWB"
@@ -21,18 +21,12 @@ set -o nounset
 if [ ${USER} != pi ]; then
 print_error "You need to be user named pi to install"
 fi
-sudo sed pi -i 's|ALL=(ALL) NOPASSWD: ALL|pi ALL=(ALL) ALL|g' /etc/sudoers.d/010_pi-nopasswd
+sudo sed -i 's|ALL=(ALL) NOPASSWD: ALL|pi ALL=(ALL) ALL|g' /etc/sudoers.d/010_pi-nopasswd
 print_message "Please enter new password for pi"
 empty_input_buffer   
 passwd
 non_root_home="${HOME}"
 non_root_user="pi"
-
-sudo -i # login to root and begin the setup
-print_message "Please enter new root password"
-empty_input_buffer   
-passwd
-
 print_message "Starting setup"
 
 # change keyboard layout to make sure the rest of installation is correct
@@ -86,7 +80,7 @@ echo "xset s off" |  tee --append ${display_file}
 echo "xset -dpms" |  tee --append ${display_file}
 echo "xset s noblank" |  tee --append ${display_file}
 
-sed -i 's/\"exited_cleanly\": true/' ${non_root_home}/.config/chromium/Default/Preferences # disable chromium message about unclean shutdown
+sed -i 's/\"exited_cleanly\": true//' ${non_root_home}/.config/chromium/Default/Preferences # disable chromium message about unclean shutdown
 
 echo "point-rpi" | tee --append ${display_file} # move mouse to convenient position
 echo "unclutter -idle 0.001 -root" | tee --append ${display_file} # hide mouse pointer
@@ -111,7 +105,7 @@ echo "disable_overscan=1" | sudo tee --append ${boot_config_file}
 
 sudo apt autoremove -y
 # change branch upstream source
-git -C ${non_root_home}/${project_name}/ branch --set-upstream-to release origin/release 
+git -C ${non_root_home}/${project_name}/ branch -u origin/release release
 
 print_message "Setup done, the system will reboot in 5 seconds"
 sleep 5
