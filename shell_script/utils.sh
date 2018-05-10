@@ -36,8 +36,8 @@ print_section()
 # for now only log error
 log ()
 {
-    touch ./maintainance.log
-    printf '%-20s %-7s %-15s %-s\n' "$(date --iso-8601=date) $(date +'%H:%M:%S')" "${1}" "\"[${2}]\"" "${3}" >> ./maintainance.log
+    touch /home/pi/maintainance.log
+    printf '%-20s %-7s %-15s %-s\n' "$(date --iso-8601=date) $(date +'%H:%M:%S')" "${1}" "\"[${2}]\"" "${3}" >> /home/pi/maintainance.log
     return 0
 }
 
@@ -91,5 +91,4 @@ source ${startup_file} # stop executing this script and relaunch bashrc to updat
 else 
 return 0
 fi
-
 }

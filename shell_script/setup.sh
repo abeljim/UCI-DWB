@@ -61,6 +61,7 @@ fi
 echo "export MODE=COMPOST" | tee --append ${startup_file} # set env var MODE to compost by default
 echo "export NON_ROOT_USER=${non_root_user}" | tee --append ${startup_file} # set env var MODE to compost by default
 echo "export TOTAL_FAILURE=0" | tee --append ${startup_file}
+echo "git checkout -C ${non_root_home}/${project_name}/ release" | tee --append ${startup_file} # change to release branch at startup
 
 # # autologin to root by default
 # sudo sed -i 's|ExecStart=-/sbin/agetty --noclear %I $TERM| ExecStart=-/sbin/agetty --noclear -a root %I $TERM |g' /lib/systemd/system/getty@.service
@@ -69,8 +70,12 @@ echo "export TOTAL_FAILURE=0" | tee --append ${startup_file}
 
 print_message "Beginning Display Configuration"
 
-# run this maintain script at startup, everything else run after maintain
-echo "source ${non_root_home}/${project_name}/shell_script/maintain.sh &" | sudo tee --append /etc/rc.local
+# run this maintain script at startup, everything else run after maintain, move to regular folder to avoid branch changing
+cp -f ${non_root_home}/${project_name}/shell_script/maintain.sh ${non_root_home}/
+cp -f ${non_root_home}/${project_name}/shell_script/utils.sh ${non_root_home}/
+sed -i 's/exit 0//' /etc/etc/rc.local
+echo "${non_root_home}/maintain.sh" | sudo tee --append /etc/rc.local
+echo "exit 0" | sudo tee --append /etc/rc.local
 
 # replace chromium pref file, TODO: change this to sed in the future
 cp -f ${non_root_home}/UCI-DWB/Preferences_Chromium ${non_root_home}/.config/chromium/Default/Preferences 
