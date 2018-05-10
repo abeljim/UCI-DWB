@@ -21,7 +21,7 @@ check_bin_role
 git -C ${non_root_user_dir}/${project_name}/ checkout release # change branch to receive update from release
 sudo ufw enable # enable firewall if not enabled
 sudo ifconfig wlan0 up # turn on network
-sleep 15 # give wlan0 time to wake up
+sleep 12 # give wlan0 time to wake up
 
 sudo service ntp restart >> /dev/null
 sudo apt-get update >> /dev/null
@@ -55,6 +55,8 @@ if [ "${TOTAL_FAILURE}" -gt 5 ]; then
 fi
 TOTAL_FAILURE=$((TOTAL_FAILURE+1))
 sed -i "s|^export TOTAL_FAILURE=.*$|export TOTAL_FAILURE=${TOTAL_FAILURE}|g" ${startup_file}
+sed -i "s|TOTAL_FAILURE=.*$||g" ${env_var_storage_file}
+echo "TOTAL_FAILURE=${TOTAL_FAILURE}" >> ${env_var_storage_file}
 reboot
 fi
 fi
@@ -62,7 +64,8 @@ fi
 sudo ifconfig wlan0 down
 sed -i "s|^export TOTAL_FAILURE=.*$|export TOTAL_FAILURE=0|g" ${startup_file} # reset total failures to 0
 touch ${env_var_storage_file} #store env storage for rc.local
-echo "TOTAL_FAILURE=0" > ${env_var_storage_file}
+sed -i "s|TOTAL_FAILURE=.*$||g" ${env_var_storage_file}
+echo "TOTAL_FAILURE=0" >> ${env_var_storage_file}
 log "INFO" "MAINTAIN" "Finish Maintainance"
 shutdown -r ${reboot_time}
 
