@@ -98,10 +98,10 @@ int openScale(FILE *log)
  * @param inputSet file descriptor set used with select
  * @param timeOut timeval struct containing timeout info
  *
- * @return float represents the increase in weight in lbs or 0 for scale weight remaining the same
- * or error code, all negative numbers returned are error code since weight decreasing is ignored
- * except for one case where the trashbag is detected to have been replaced, the function will
- * adjust the var that stored prev reading accordingly
+ * @return float represents the increase in weight in ounces or 0 for scale weight remaining the
+ * same or error code, all negative numbers returned are error code since weight decreasing is
+ * ignored except for one case where the trashbag is detected to have been replaced, the function
+ * will adjust the var that stored prev reading accordingly
  *
  * The function stores some data about the previous scale reading and compare with the current one
  * to decide if the data has changed, this reduced waste of time spent processing repeated data,
