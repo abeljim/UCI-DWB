@@ -38,7 +38,7 @@ int main(void)
   strcat(saveDir, homeDir);
   strcat(saveDir, "/UCI-DWB/");
   strcat(saveDir, mode);
-  strcat(saveDir, "/result.json");
+  strcat(saveDir, "/javascript_and_json/result.json");
   FILE *saveFile = fopen(saveDir, "w");
   assert(saveFile);
   fclose(saveFile);
