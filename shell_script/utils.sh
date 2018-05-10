@@ -48,3 +48,44 @@ empty_input_buffer()
     return 0
 }
 
+# pin state ref: https://raspberrypi.stackexchange.com/questions/51479/gpio-pin-states-on-powerup
+check_bin_role()
+{
+# pins if pulled high, indicate the correspoding bin types
+compost_pin=22
+recycle_pin=24
+landfill_pin=10
+gpio_dir="/sys/class/gpio/"
+
+echo ${compost_pin} > ${gpio_dir}/export
+echo ${recycle_pin} > ${gpio_dir}/export
+echo ${landfill_pin} > ${gpio_dir}/export
+
+echo "in" > ${gpio_dir}/gpio${compost_pin}/direction
+echo "in" > ${gpio_dir}/gpio${recycle_pin}/direction
+echo "in" > ${gpio_dir}/gpio${landfill_pin}/direction
+
+if [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 1 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 0 ]
+then
+    new_mode=COMPOST
+elif [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 1 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 0 ]
+then
+    new_mode=RECYCLE
+elif [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 1 ]
+then
+    new_mode=LANDFILL
+else
+    log "ERROR" "GPIO" "Unknown Pin State"
+    sleep 5
+    reboot 
+fi
+
+# only launch the script again if the mode is different from last time
+if [ "${new_mode}" != "${MODE}" ]; then
+sed -i "s|^export MODE=.*$|export MODE=${new_mode}|g" ${startup_file}
+exec ${startup_file} # stop executing this script and relaunch bashrc to update env var MODE
+else 
+return 0
+fi
+
+}
