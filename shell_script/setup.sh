@@ -6,7 +6,7 @@ software=" xserver-xorg xinit ufw ntp gcc chromium-browser unclutter git "
 
 version="final"
 project_name="UCI-DWB"
-startup_file="${HOME}/.bashrc" # location of file that would be run when user logins
+startup_file="/etc/rc.local" # location of file that would be run when user logins
 display_file="${HOME}/.xinitrc"
 boot_config_file="/boot/config.txt"
 MODE="compost" # later become env variable to determine which mode this pi is running on
@@ -58,10 +58,8 @@ else
 touch ${display_file}
 fi
 
-echo "export MODE=compost" | tee --append ${startup_file} # set env var MODE to compost by default
-echo "export NON_ROOT_USER=${non_root_user}" | tee --append ${startup_file} # set env var MODE to compost by default
-echo "export TOTAL_FAILURE=0" | tee --append ${startup_file}
-echo "git -C ${non_root_home}/${project_name}/ checkout release" | tee --append ${startup_file} # change to release branch at startup
+echo "export MODE=COMPOST" | tee --append ${display_file} # set env var MODE to compost by default
+echo "git -C ${non_root_home}/${project_name}/ checkout release" | tee --append ${display_file} # change to release branch at startup
 
 # # autologin to root by default
 # sudo sed -i 's|ExecStart=-/sbin/agetty --noclear %I $TERM| ExecStart=-/sbin/agetty --noclear -a root %I $TERM |g' /lib/systemd/system/getty@.service
@@ -73,9 +71,9 @@ print_message "Beginning Display Configuration"
 # run this maintain script at startup, everything else run after maintain, move to regular folder to avoid branch changing
 cp -f ${non_root_home}/${project_name}/shell_script/maintain.sh ${non_root_home}/
 cp -f ${non_root_home}/${project_name}/shell_script/utils.sh ${non_root_home}/
-sed -i 's/exit 0//' /etc/etc/rc.local
-echo "${non_root_home}/maintain.sh" | sudo tee --append /etc/rc.local
-echo "exit 0" | sudo tee --append /etc/rc.local
+sed -i 's/exit 0//' ${startup_file}
+echo "${non_root_home}/maintain.sh" | sudo tee --append ${startup_file}
+echo "exit 0" | sudo tee --append ${startup_file}
 
 # replace chromium pref file, TODO: change this to sed in the future
 cp -f ${non_root_home}/UCI-DWB/Preferences_Chromium ${non_root_home}/.config/chromium/Default/Preferences 
@@ -96,7 +94,7 @@ echo "ACTION==\"add\",SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"0403\", ATTRS{idPro
 # add running html file to display file
 echo "chromium-browser --noerrdialogs --kiosk --incognito --allow-file-access-from-files ${non_root_home}/${project_name}/${MODE}/index.html &" | tee --append ${display_file}
 
-echo "xinit" | tee --append ${startup_file} # start x server at login
+echo "xinit" | tee --append ${display_file} # start x server at login
 
 # set 720p to the pi, source for the settings: https://elinux.org/RPiconfig#Video_mode_options 
 sudo sed -i 's/.*hdmi_mode=.*//' ${boot_config_file} # wipe old settings first

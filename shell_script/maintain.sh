@@ -8,8 +8,6 @@ project_name="UCI-DWB"
 
 env_var_storage_file="/home/pi/env_storage.txt"
 source ${env_var_storage_file}
-startup_file="/home/pi/.bashrc" # NON_ROOT_USER set during initial installation
-chmod u+x ${startup_file}
 non_root_user_dir="/home/pi"
 source ${non_root_user_dir}/utils.sh
 #--------------------------------------------------------------
@@ -38,7 +36,6 @@ if ! git -C ${non_root_user_dir}/${project_name}/ fetch ; then
     TOTAL_FAILURE=$((TOTAL_FAILURE+1))
     sed -i "s|TOTAL_FAILURE=.*$||g" ${env_var_storage_file}
     echo "TOTAL_FAILURE=${TOTAL_FAILURE}" >> ${env_var_storage_file}
-    sed -i "s|^export TOTAL_FAILURE=.*$|export TOTAL_FAILURE=${TOTAL_FAILURE}|g" ${startup_file}
     reboot
 fi
 # only pull and rerun stuffs if there is update
@@ -54,7 +51,6 @@ if [ "${TOTAL_FAILURE}" -gt 5 ]; then
     exit 1 # exit and leave the screen blank so people can contact the team instead of infinite reboot
 fi
 TOTAL_FAILURE=$((TOTAL_FAILURE+1))
-sed -i "s|^export TOTAL_FAILURE=.*$|export TOTAL_FAILURE=${TOTAL_FAILURE}|g" ${startup_file}
 sed -i "s|TOTAL_FAILURE=.*$||g" ${env_var_storage_file}
 echo "TOTAL_FAILURE=${TOTAL_FAILURE}" >> ${env_var_storage_file}
 reboot
@@ -62,7 +58,6 @@ fi
 fi
 
 sudo ifconfig wlan0 down
-sed -i "s|^export TOTAL_FAILURE=.*$|export TOTAL_FAILURE=0|g" ${startup_file} # reset total failures to 0
 touch ${env_var_storage_file} #store env storage for rc.local
 sed -i "s|TOTAL_FAILURE=.*$||g" ${env_var_storage_file}
 echo "TOTAL_FAILURE=0" >> ${env_var_storage_file}
