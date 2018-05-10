@@ -1,0 +1,101 @@
+body {
+  background-color: #ffffff;
+  background-image: url("images/overlay.png"), -moz-linear-gradient(45deg, #56ab2f 15%, #a8e063 85%);
+  background-image: url("images/overlay.png"), -webkit-linear-gradient(45deg, #56ab2f 15%, #a8e063 85%);
+  background-image: url("images/overlay.png"), -ms-linear-gradient(45deg, #56ab2f 15%, #a8e063 85%);
+  background-image: url("images/overlay.png"), linear-gradient(45deg, #56ab2f 15%, #a8e063 85%);
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-size: 30pt;
+  font-weight: 300;
+  line-height: 1.65;
+
+  color: rgba(255, 255, 255, 0.65);
+}
+
+@-webkit-keyframes bounceInDown {
+  from,
+  10%,
+  12.5%,
+  15%,
+  to {
+    -webkit- animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+  }
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -3000px, 0);
+  }
+  10% {
+    opacity: 1;
+    transform: translate3d(0, 25px, 0);
+  }
+  12.5% {
+    transform: translate3d(0, -10px, 0);
+  }
+  15% {
+    transform: translate3d(0, 5px, 0);
+  }
+  16.7% {
+    transform: none;
+  }
+  from,
+  85% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.centered {
+  color: black;
+  position: absolute;
+  text-align: center;
+  top: 11%;
+  left: 35%;
+  font-size: .75em;
+  transform: translate(-50%, -50%);
+  transform: rotate(4.8deg);
+}
+
+.quotebox {
+  color: black;
+  position: absolute;
+  top: 5%;
+  left: 34%;
+  font-size: .6em;
+  transform: translate(-50%, -50%);
+  transform: rotate(4.8deg);
+}
+
+.centered2 {
+  color: black;
+  position: absolute;
+  text-align: center;
+  top: 22%;
+  left: 36%;
+  font-size: .5em;
+  transform: translate(-50%, -50%);
+  transform: rotate(4.8deg);
+}
+
+.quotebox2 {
+  color: black;
+  position: absolute;
+  top: 37%;
+  left: 34%;
+  font-size: .5em;
+  transform: translate(-50%, -50%);
+  transform: rotate(4.8deg);
+}
+
+.logo {
+  background-color: transparent;
+  position: absolute;
+  top: 95%;
+  left: 33%;
+}

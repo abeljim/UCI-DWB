@@ -1,0 +1,100 @@
+body {
+  background-color: #ffffff;
+  background-image: url("images/overlay.png"), -moz-linear-gradient(45deg, #bdc3c7 15%, #2c3e50 85%);
+  background-image: url("images/overlay.png"), -webkit-linear-gradient(45deg, #bdc3c7 15%, #2c3e50 85%);
+  background-image: url("images/overlay.png"), -ms-linear-gradient(45deg, #bdc3c7 15%, #2c3e50 85%);
+  background-image: url("images/overlay.png"), linear-gradient(45deg, #bdc3c7 15%, #2c3e50 85%);
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-size: 30pt;
+  font-weight: 300;
+  line-height: 1.65;
+
+  color: rgba(255, 255, 255, 0.65);
+}
+
+@-webkit-keyframes bounceInDown {
+  from {
+    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+    animation-timing-function: ease-in;
+    opacity: 0;
+  }
+
+  2.5% {
+    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
+    animation-timing-function: ease-in;
+  }
+
+  3.75% {
+    transform: perspective(400px) rotate3d(1, 0, 0, 10deg);
+    opacity: 1;
+  }
+
+  5% {
+    transform: perspective(400px) rotate3d(1, 0, 0, -5deg);
+  }
+
+  to 6.25% {
+    transform: perspective(400px);
+  }
+  from,
+  85% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.centered {
+  color: black;
+  position: absolute;
+  text-align: center;
+  top: 26%;
+  left: 38%;
+  font-size: .75em;
+  transform: translate(-50%, -50%);
+  transform: rotate(4.8deg);
+}
+
+.quotebox {
+  color: black;
+  position: absolute;
+  top: 5%;
+  left: 31%;
+  font-size: .6em;
+  transform: translate(-50%, -50%);
+  transform: rotate(4.8deg);
+}
+
+.centered2 {
+  color: black;
+  position: absolute;
+  text-align: center;
+  top: 22%;
+  left: 36%;
+  font-size: .5em;
+  transform: translate(-50%, -50%);
+  transform: rotate(4.8deg);
+}
+
+.quotebox2 {
+  color: black;
+  position: absolute;
+  top: 35%;
+  left: 30%;
+  font-size: 30pt;
+  transform: translate(-50%, -50%);
+  transform: rotate(4.8deg);
+}
+
+.logo {
+  background-color: transparent;
+  position: absolute;
+  top: 95%;
+  left: 33%;
+}
