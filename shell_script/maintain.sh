@@ -10,6 +10,7 @@ env_var_storage_file="/home/pi/env_storage.txt"
 source ${env_var_storage_file}
 non_root_user_dir="/home/pi"
 source ${non_root_user_dir}/utils.sh
+devBrand=iss19
 #--------------------------------------------------------------
 log "INFO" "MAINTAIN" "Starting Maintainance"
 
@@ -19,7 +20,7 @@ display_file="/home/pi/.xinitrc"
 sed -i "s/export MODE=.*/export MODE=${mode}/g" ${display_file}
 
 # MAINTAINANCE CODE
-git -C ${non_root_user_dir}/${project_name}/ checkout release # change branch to receive update from release
+git -C ${non_root_user_dir}/${project_name}/ checkout ${devBrand} # change branch to receive update from ${devBrand}
 sudo ufw enable # enable firewall if not enabled
 sudo ifconfig wlan0 up # turn on network
 sleep 11 # give wlan0 time to wake up
@@ -42,7 +43,7 @@ if ! git -C ${non_root_user_dir}/${project_name}/ fetch ; then
     reboot
 fi
 # only pull and rerun stuffs if there is update
-if [ $(git -C ${non_root_user_dir}/${project_name}/ rev-list  --count origin/release...release) -gt 0 ]; then
+if [ $(git -C ${non_root_user_dir}/${project_name}/ rev-list  --count origin/${devBrand}...${devBrand}) -gt 0 ]; then
 log "INFO" "UPDATE" "Found Upates"
 if git -C ${non_root_user_dir}/${project_name}/ pull ; then
 log "INFO" "UPDATE" "Finished Applying Update"
