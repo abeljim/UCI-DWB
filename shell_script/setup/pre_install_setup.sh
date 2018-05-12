@@ -3,7 +3,7 @@
 source ./env_var.sh
 source ../utils.sh
 #-------------------------------------------------------------------------------
-
+check_subshell_run
 if [ ${USER} != pi ]; then
 print_error "You need to be user named pi to install"
 fi
@@ -19,8 +19,8 @@ sudo sed -i 's|pi ALL=(ALL) NOPASSWD: ALL|pi ALL=(ALL) ALL|g' /etc/sudoers.d/010
 print_message "Please enter new password for pi"
 empty_input_buffer   
 passwd
-non_root_home="${HOME}"
 print_message "Starting setup"
+git clone https://github.com/khoitd1997/OS_Setup.git ${HOME}/
 
 # change keyboard layout to make sure the rest of installation is correct
 sudo sed -i '/XKBLAYOUT/d' /etc/default/keyboard

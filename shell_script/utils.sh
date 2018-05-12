@@ -7,6 +7,7 @@ yellow='\033[38;5;226m' #for error
 green='\033[38;5;154m' #for general messages
 reset='\033[0m' #for resetting the color
 
+#-------------------------------------------------------------
 # print general messages
 print_message()
 {
@@ -83,4 +84,19 @@ else
     reboot 
 fi
 return ${mode}
+}
+
+# check if script is being run in subshell or not
+# aka if command being run source script.sh or ./script.sh
+check_subshell_run()
+{
+script_name=$( basename ${0#-} ) #- needed if sourced no path
+this_script=$( basename ${BASH_SOURCE} )
+if [[ ${script_name} = ${this_script} ]] ; then
+    echo "Please run with source command instead of ./"
+    exit 1
+else
+    echo "Script is being sourced, continuing" 
+
+fi 
 }

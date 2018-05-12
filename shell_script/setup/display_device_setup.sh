@@ -2,7 +2,7 @@
 # used for setting up display and scale
 source ./env_var.sh
 source ../utils.sh
-
+set -o xtrace
 #---------------------------------------------------------------
 
 print_message "Beginning Display Configuration"
