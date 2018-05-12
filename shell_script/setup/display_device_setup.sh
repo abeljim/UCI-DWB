@@ -42,8 +42,9 @@ cp -f ${non_root_home}/UCI-DWB/Preferences_Chromium ${non_root_home}/.config/chr
 #---------------------------------------------------------
 # CONFIGURE STARTUP SCRIPTS
 # run maintain script at startup, everything else run after maintain, move to regular folder to avoid branch changing
-# autologin to pi by default
-sudo sed -i 's|ExecStart=-/sbin/agetty --noclear %I $TERM| ExecStart=-/sbin/agetty --noclear -a pi %I $TERM |g' /lib/systemd/system/getty@.service
+
+sudo sed -i 's|1:2345:respawn:/sbin/getty 115200 tty1|#1:2345:respawn:/sbin/getty 115200 tty1|g' /etc/inittab
+echo "1:2345:respawn:/bin/login -f pi tty1 </dev/tty1 >/dev/tty1 2>&1" | sudo tee --append /etc/inittab
 # echo "git -C ${non_root_home}/${project_name}/ checkout ${devBranch}" | tee --append ${display_file} # change to release branch at startup
 cp -f ${non_root_home}/${project_name}/shell_script/maintain.sh ${non_root_home}/
 cp -f ${non_root_home}/${project_name}/shell_script/utils.sh ${non_root_home}/
@@ -69,3 +70,6 @@ echo "disable_overscan=1" | sudo tee --append ${boot_config_file}
 # CONFIGURE SCALE
 # create symlink for the scale, the number seems to be same for every scale
 echo "ACTION==\"add\",SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"0403\", ATTRS{idProduct}==\"6001\", SYMLINK+=\"SCALE\"" | sudo tee --append /etc/udev/rules.d/99-com.rules
+echo "xinit" >> /home/pi/.bashrc # turn on screen when user login
+# autologin to pi by default
+sudo sed -i 's|ExecStart=-/sbin/agetty --noclear %I $TERM| ExecStart=-/sbin/agetty --noclear -a pi %I $TERM |g' /lib/systemd/system/getty@.service

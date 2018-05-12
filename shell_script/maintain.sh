@@ -10,13 +10,56 @@ env_var_storage_file="/home/pi/env_storage.txt"
 display_file="/home/pi/.xinitrc"
 source ${env_var_storage_file}
 non_root_user_dir="/home/pi"
-source ${non_root_user_dir}/utils.sh
 devBrand=iss9
+mode=""
+
+log()
+{
+    touch /home/pi/maintainance.log
+    printf '%-20s %-7s %-15s %-s\n' "$(date --iso-8601=date) $(date +'%H:%M:%S')" "${1}" "\"[${2}]\"" "${3}" >> /home/pi/maintainance.log
+    return 0
+}
+# pin state ref: https://raspberrypi.stackexchange.com/questions/51479/gpio-pin-states-on-powerup
+# pin graph ref:
+# https://www.jameco.com/Jameco/workshop/circuitnotes/raspberry-pi-circuit-note.html
+
 #--------------------------------------------------------------
 log "INFO" "MAINTAIN" "Starting Maintainance"
 
-check_bin_role
-mode=$?
+# pins if pulled high, indicate the correspoding bin types
+compost_pin=22
+recycle_pin=24
+landfill_pin=10
+gpio_dir="/sys/class/gpio"
+
+# pin setup these may failed if the pin is already setup
+echo ${compost_pin} > ${gpio_dir}/export
+sleep 1
+echo ${recycle_pin} > ${gpio_dir}/export
+sleep 1
+echo ${landfill_pin} > ${gpio_dir}/export
+sleep 1
+echo "in" > ${gpio_dir}/gpio${compost_pin}/direction
+sleep 1
+echo "in" > ${gpio_dir}/gpio${recycle_pin}/direction
+sleep 1
+echo "in" > ${gpio_dir}/gpio${landfill_pin}/direction
+sleep 1
+
+if [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 1 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 0 ]
+then
+    mode=compost
+elif [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 1 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 0 ]
+then
+    mode=recycle
+elif [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 1 ]
+then
+    mode=landfill
+else
+    log "ERROR" "GPIO" "Unknown Pin State"
+    sleep 5
+    reboot 
+fi
 
 sed -i "s/export MODE=.*/export MODE=${mode}/g" ${display_file}
 
@@ -48,7 +91,7 @@ if [ $(git -C ${non_root_user_dir}/${project_name}/ rev-list  --count origin/${d
 log "INFO" "UPDATE" "Found Upates"
 if git -C ${non_root_user_dir}/${project_name}/ pull ; then
 log "INFO" "UPDATE" "Finished Applying Update"
-reboot
+# reboot
 else
 log "ERROR" "UPDATE" "Error updating"
 if [ "${TOTAL_FAILURE}" -gt 5 ]; then
@@ -58,7 +101,7 @@ fi
 TOTAL_FAILURE=$((TOTAL_FAILURE+1))
 sed -i "s|TOTAL_FAILURE=.*$||g" ${env_var_storage_file}
 echo "TOTAL_FAILURE=${TOTAL_FAILURE}" >> ${env_var_storage_file}
-reboot
+# reboot
 fi
 fi
 
@@ -71,6 +114,5 @@ shutdown -r ${reboot_time} # schedule reboot everyday when the food court is not
 
 # run scale code and start display
 make -C ${non_root_user_dir}/${project_name}/scale
-./${non_root_user_dir}/${project_name}/scale/scale_main.out ${mode} &
+${non_root_user_dir}/${project_name}/scale/scale_main.out ${mode} &
 sleep 1
-xinit &

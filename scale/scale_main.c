@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 {
   // retrieve env var to get path for saving stuffs and determine the role of the bin
 
-  const char *homeDir = getenv("HOME");
+  char homeDir[] = "/home/pi";
   assert(homeDir);
   char logDir[100] = "";
   strcat(logDir, homeDir);
@@ -43,18 +43,16 @@ int main(int argc, char **argv)
   uint8_t timeoutCounter = 0;
   assert(log);
 
-  if ((strcmp(argv[1], "compost") && strcmp(argv[1], "recycle") && strcmp(argv[1], "landfill")) ||
-      argc < 2)
+  if ((strcmp(argv[1], "compost") && strcmp(argv[1], "recycle") && strcmp(argv[1], "landfill")))
     {
       scaleLogging("ERROR", "Unknown bin type", log, "PRE_LOOP");
       return 1;
     }
-  char *mode         = argv[0];
+  char *mode         = argv[1];
   char  saveDir[100] = "";
   strcat(saveDir, homeDir);
   strcat(saveDir, "/UCI-DWB/");
-  strcat(saveDir, mode);
-  strcat(saveDir, "/javascript_and_json/result.json");
+  strcat(saveDir, "javascript_and_json/result.json");
   FILE *saveFile = fopen(saveDir, "w");
   assert(saveFile);
   fclose(saveFile);
