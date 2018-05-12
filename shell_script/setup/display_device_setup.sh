@@ -43,8 +43,6 @@ cp -f ${non_root_home}/UCI-DWB/Preferences_Chromium ${non_root_home}/.config/chr
 # CONFIGURE STARTUP SCRIPTS
 # run maintain script at startup, everything else run after maintain, move to regular folder to avoid branch changing
 
-sudo sed -i 's|1:2345:respawn:/sbin/getty 115200 tty1|#1:2345:respawn:/sbin/getty 115200 tty1|g' /etc/inittab
-echo "1:2345:respawn:/bin/login -f pi tty1 </dev/tty1 >/dev/tty1 2>&1" | sudo tee --append /etc/inittab
 # echo "git -C ${non_root_home}/${project_name}/ checkout ${devBranch}" | tee --append ${display_file} # change to release branch at startup
 cp -f ${non_root_home}/${project_name}/shell_script/maintain.sh ${non_root_home}/
 cp -f ${non_root_home}/${project_name}/shell_script/utils.sh ${non_root_home}/
