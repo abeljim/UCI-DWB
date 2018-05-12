@@ -23,17 +23,15 @@ echo "xset -dpms" |  tee --append ${display_file}
 echo "xset s noblank" |  tee --append ${display_file}
 
 echo "point-rpi" | tee --append ${display_file} # move mouse to convenient position
-echo "unclutter -idle 0.001 -root" | tee --append ${display_file} # hide mouse pointer
+echo "unclutter -idle 0.001 -root &" | tee --append ${display_file} # hide mouse pointer
 
 echo "export MODE=${MODE}" | tee --append ${display_file} # set env var MODE to compost by default
-# echo "git -C ${non_root_home}/${project_name}/ checkout ${devBranch}" | tee --append ${display_file} # change to release branch at startup
 touch /home/pi/env_storage.txt
 echo "TOTAL_FAILURE=0" >> /home/pi/env_storage.txt # create fie to store env variable
-# # autologin to root by default
-# sudo sed -i 's|ExecStart=-/sbin/agetty --noclear %I $TERM| ExecStart=-/sbin/agetty --noclear -a root %I $TERM |g' /lib/systemd/system/getty@.service
+
 
 # add running html file to display file
-echo "chromium-browser --noerrdialogs --kiosk --incognito --allow-file-access-from-files ${non_root_home}/${project_name}/'${MODE}'/index.html " | tee --append ${display_file}
+echo "chromium-browser --noerrdialogs --kiosk --incognito --allow-file-access-from-files ${non_root_home}/${project_name}/\${MODE}/index.html " | tee --append ${display_file}
 print_message "please start the xserver on another console(Alt + F2) using xinit command and then quit out of that shell with Ctrl+Alt+F1, then press enter"
 empty_input_buffer
 read xserverDone
@@ -44,6 +42,9 @@ cp -f ${non_root_home}/UCI-DWB/Preferences_Chromium ${non_root_home}/.config/chr
 #---------------------------------------------------------
 # CONFIGURE STARTUP SCRIPTS
 # run maintain script at startup, everything else run after maintain, move to regular folder to avoid branch changing
+# autologin to pi by default
+sudo sed -i 's|ExecStart=-/sbin/agetty --noclear %I $TERM| ExecStart=-/sbin/agetty --noclear -a pi %I $TERM |g' /lib/systemd/system/getty@.service
+# echo "git -C ${non_root_home}/${project_name}/ checkout ${devBranch}" | tee --append ${display_file} # change to release branch at startup
 cp -f ${non_root_home}/${project_name}/shell_script/maintain.sh ${non_root_home}/
 cp -f ${non_root_home}/${project_name}/shell_script/utils.sh ${non_root_home}/
 sudo sed -i 's/exit 0//' ${startup_file}

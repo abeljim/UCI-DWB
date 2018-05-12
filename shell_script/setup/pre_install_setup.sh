@@ -22,6 +22,7 @@ passwd
 print_message "Starting setup"
 sudo apt-get install -y git
 git clone https://github.com/abeljim/UCI-DWB.git ${HOME}/UCI-DWB
+git -C /home/pi/UCI-DWB checkout iss19
 
 # change keyboard layout to make sure the rest of installation is correct
 sudo sed -i '/XKBLAYOUT/d' /etc/default/keyboard

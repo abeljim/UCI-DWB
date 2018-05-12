@@ -2,7 +2,7 @@
 # contain environment variable used for setup
 
 # list of necessary software
-software=" xserver-xorg xinit ufw ntp gcc chromium-browser unclutter git "
+software=" xserver-xorg xinit ufw ntp gcc chromium-browser unclutter git point-rpi "
 
 project_name="UCI-DWB"
 non_root_home="/home/pi"
