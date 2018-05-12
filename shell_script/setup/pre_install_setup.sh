@@ -20,7 +20,8 @@ print_message "Please enter new password for pi"
 empty_input_buffer   
 passwd
 print_message "Starting setup"
-git clone https://github.com/khoitd1997/OS_Setup.git ${HOME}/
+sudo apt-get install -y git
+git clone https://github.com/abeljim/UCI-DWB.git ${HOME}/UCI-DWB
 
 # change keyboard layout to make sure the rest of installation is correct
 sudo sed -i '/XKBLAYOUT/d' /etc/default/keyboard

@@ -7,16 +7,17 @@ reboot_time="23:45"
 project_name="UCI-DWB"
 
 env_var_storage_file="/home/pi/env_storage.txt"
+display_file="/home/pi/.xinitrc"
 source ${env_var_storage_file}
 non_root_user_dir="/home/pi"
 source ${non_root_user_dir}/utils.sh
-devBrand=iss19
+devBrand=iss9
 #--------------------------------------------------------------
 log "INFO" "MAINTAIN" "Starting Maintainance"
 
 check_bin_role
 mode=$?
-display_file="/home/pi/.xinitrc"
+
 sed -i "s/export MODE=.*/export MODE=${mode}/g" ${display_file}
 
 # MAINTAINANCE CODE
@@ -73,4 +74,3 @@ make -C ${non_root_user_dir}/${project_name}/scale
 ./${non_root_user_dir}/${project_name}/scale/scale_main.out ${mode} &
 sleep 1
 xinit &
-exit 0
