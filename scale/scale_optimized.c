@@ -21,8 +21,8 @@
 #include "scale_optimized.h"
 #include "scale_utils.h"
 
-// #define SCALE_DEV_FILE "/dev/SCALE"
-#define SCALE_DEV_FILE "/dev/ttyUSB0"
+#define SCALE_DEV_FILE "/dev/SCALE"
+// #define SCALE_DEV_FILE "/dev/ttyUSB0"
 
 #define SCALE_MESSAGE_SIZE 6  //!< defined by the manual
 #define RECONNECT_ATTEMPTS \

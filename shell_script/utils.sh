@@ -7,6 +7,7 @@ yellow='\033[38;5;226m' #for error
 green='\033[38;5;154m' #for general messages
 reset='\033[0m' #for resetting the color
 
+#-------------------------------------------------------------
 # print general messages
 print_message()
 {
@@ -36,8 +37,8 @@ print_section()
 # for now only log error
 log ()
 {
-    touch ./maintainance.log
-    printf '%-20s %-7s %-15s %-s\n' "$(date --iso-8601=date) $(date +'%H:%M:%S')" "${1}" "\"[${2}]\"" "${3}" >> ./maintainance.log
+    touch /home/pi/maintainance.log
+    printf '%-20s %-7s %-15s %-s\n' "$(date --iso-8601=date) $(date +'%H:%M:%S')" "${1}" "\"[${2}]\"" "${3}" >> /home/pi/maintainance.log
     return 0
 }
 
@@ -53,7 +54,6 @@ empty_input_buffer()
 # https://www.jameco.com/Jameco/workshop/circuitnotes/raspberry-pi-circuit-note.html
 check_bin_role()
 {
-startup_file="/home/${NON_ROOT_USER}/.bashrc" # NON_ROOT_USER set during initial installation
 
 # pins if pulled high, indicate the correspoding bin types
 compost_pin=22
@@ -71,25 +71,32 @@ echo "in" > ${gpio_dir}/gpio${landfill_pin}/direction
 
 if [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 1 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 0 ]
 then
-    new_mode=COMPOST
+    mode=compost
 elif [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 1 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 0 ]
 then
-    new_mode=RECYCLE
+    mode=recycle
 elif [ $(cat ${gpio_dir}/gpio${compost_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${recycle_pin}/value) = 0 ] && [ $(cat ${gpio_dir}/gpio${landfill_pin}/value) = 1 ]
 then
-    new_mode=LANDFILL
+    mode=landfill
 else
     log "ERROR" "GPIO" "Unknown Pin State"
     sleep 5
     reboot 
 fi
+return ${mode}
+}
 
-# only launch the script again if the mode is different from last time
-if [ "${new_mode}" != "${MODE}" ]; then
-sed -i "s|^export MODE=.*$|export MODE=${new_mode}|g" ${startup_file}
-source ${startup_file} # stop executing this script and relaunch bashrc to update env var MODE
-else 
-return 0
-fi
+# check if script is being run in subshell or not
+# aka if command being run source script.sh or ./script.sh
+check_subshell_run()
+{
+script_name=$( basename ${0#-} ) #- needed if sourced no path
+this_script=$( basename ${BASH_SOURCE} )
+if [[ ${script_name} = ${this_script} ]] ; then
+    echo "Please run with source command instead of ./"
+    exit 1
+else
+    echo "Script is being sourced, continuing" 
 
+fi 
 }
