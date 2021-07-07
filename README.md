@@ -1,3 +1,9 @@
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge)](https://GitHub.com/abeljim/UCI-DWB/graphs/commit-activity)       [![GitHub license](https://img.shields.io/github/license/abeljim/UCI-DWB.svg?style=for-the-badge)](https://github.com/abeljim/UCI-DWB/blob/master/LICENSE)
+        [![GitHub issues](https://img.shields.io/github/issues/abeljim/UCI-DWB.svg?style=for-the-badge)](https://GitHub.com/abeljim/UCI-DWB/issues/)
+        [![GitHub pull-requests](https://img.shields.io/github/issues-pr/abeljim/UCI-DWB.svg?style=for-the-badge)](https://GitHub.com/abeljim/UCI-DWB/pull/)
+
+
+
 # UCI DWB
 
 ## Introduction
@@ -10,6 +16,3 @@ This is a new repo with optimized framework and backend for UCI digital wastebin
 ## Structure
 This repo includes necessary files to both run, maintaina a chromium based smart wastebin, as of 4/2018, it only supports webkit so other browsers are not compatible 
 
-## Dev Note (basically tips for people developing this project)
-- At beginning of each shell scripts, there are comments about its general functionalities
-- Press Ctrl + Alt + F1 to exit the X server 

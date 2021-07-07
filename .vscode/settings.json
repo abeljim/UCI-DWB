@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.cu": "c",
+        "*.tdd": "makefile",
+        "strings.h": "c",
+        "assert.h": "c",
+        "termios.h": "c",
+        "scale_utils.h": "c"
+    }
+}
